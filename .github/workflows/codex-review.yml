@@ -1,0 +1,100 @@
+name: Codex Code Review
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  codex_review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      final_message: ${{ steps.codex.outputs['final-message'] }}
+      codex_outcome: ${{ steps.codex.outcome }}
+    steps:
+      - name: Check out PR merge commit
+        uses: actions/checkout@v5
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+
+      - name: Fetch base and head refs
+        run: |
+          git fetch --no-tags origin \
+            ${{ github.event.pull_request.base.ref }} \
+            +refs/pull/${{ github.event.pull_request.number }}/head
+
+      - name: Run Codex review
+        id: codex
+        continue-on-error: true
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: |
+            You are reviewing pull request #${{ github.event.pull_request.number }} for ${{ github.repository }}.
+
+            Consider only the changes introduced by this PR:
+              git log --oneline ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+
+            Provide concise, actionable findings that focus on:
+              * Correctness and potential regressions in the TypeScript/Node.js backend.
+              * Test coverage gaps or missing validation.
+              * Performance, security, and reliability concerns.
+
+            Prefer bullet lists. Highlight blockers first, then optional suggestions. Reference files and line numbers when possible.
+
+            Pull request title and body:
+            ----
+            ${{ github.event.pull_request.title }}
+            ${{ github.event.pull_request.body }}
+
+  post_feedback:
+    runs-on: ubuntu-latest
+    needs: codex_review
+    if: needs.codex_review.outputs.codex_outcome == 'success' && needs.codex_review.outputs.final_message != ''
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Post Codex feedback
+        uses: actions/github-script@v7
+        env:
+          CODEX_FINAL_MESSAGE: ${{ needs.codex_review.outputs.final_message }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: process.env.CODEX_FINAL_MESSAGE,
+            });
+
+  codex_failure_notice:
+    runs-on: ubuntu-latest
+    needs: codex_review
+    if: needs.codex_review.outputs.codex_outcome == 'failure'
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Report Codex API issue
+        uses: actions/github-script@v7
+        env:
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: [
+                "⚠️ Codex review could not run because the Responses API rejected the request (likely quota or authentication).",
+                "Check the workflow run for details: " + process.env.WORKFLOW_URL,
+                "",
+                "The PR checks are still passing, but Codex feedback is missing until the API issue is resolved."
+              ].join("\n"),
+            });
