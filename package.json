@@ -4,13 +4,10 @@
   "description": "Learning project: Testing LLM-powered call summarization service",
   "private": true,
   "workspaces": [
-    "backend",
-    "ts-test"
+    "backend"
   ],
   "scripts": {
-    "backend": "npm run dev --workspace=backend",
-    "test": "npm run test --workspace=ts-test",
-    "test:watch": "npm run test:watch --workspace=ts-test"
+    "backend": "npm run dev --workspace=backend"
   },
   "keywords": [
     "llm",
