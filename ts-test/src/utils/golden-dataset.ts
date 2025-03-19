@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -135,12 +135,29 @@ export class GoldenDatasetLoader {
       throw new GoldenDatasetValidationError('golden_summary must be a non-empty string', { id: tc.id });
     }
 
-    // Validate metadata object
     if (!tc.metadata || typeof tc.metadata !== 'object') {
       throw new GoldenDatasetValidationError('metadata must be an object', { id: tc.id });
     }
 
-    // Validate thresholds object
+    const metadata = tc.metadata as Record<string, unknown>;
+    if (typeof metadata.sentiment !== 'string' || metadata.sentiment.trim().length === 0) {
+      throw new GoldenDatasetValidationError('metadata.sentiment must be a non-empty string', { id: tc.id });
+    }
+
+    if (typeof metadata.resolution_status !== 'string' || metadata.resolution_status.trim().length === 0) {
+      throw new GoldenDatasetValidationError('metadata.resolution_status must be a non-empty string', { id: tc.id });
+    }
+
+    if (!Array.isArray(metadata.key_points)) {
+      throw new GoldenDatasetValidationError('metadata.key_points must be an array', { id: tc.id });
+    }
+
+    for (const point of metadata.key_points) {
+      if (typeof point !== 'string' || point.trim().length === 0) {
+        throw new GoldenDatasetValidationError('metadata.key_points must contain only non-empty strings', { id: tc.id });
+      }
+    }
+
     if (!tc.thresholds || typeof tc.thresholds !== 'object') {
       throw new GoldenDatasetValidationError('thresholds must be an object', { id: tc.id });
     }
@@ -177,6 +194,12 @@ export class GoldenDatasetLoader {
 
     if (!Array.isArray(thresholds.required_terms)) {
       throw new GoldenDatasetValidationError('required_terms must be an array', { id: tc.id });
+    }
+
+    for (const term of thresholds.required_terms) {
+      if (typeof term !== 'string' || term.trim().length === 0) {
+        throw new GoldenDatasetValidationError('required_terms must contain only non-empty strings', { id: tc.id });
+      }
     }
   }
 
@@ -246,7 +269,22 @@ export class GoldenDatasetLoader {
       );
     }
 
-    const casePath = join(this.datasetPath, testCaseInfo.file);
+    if (testCaseInfo.file.includes('..') || testCaseInfo.file.startsWith('/')) {
+      throw new GoldenDatasetValidationError(
+        'Invalid file path: absolute paths and parent directory traversal are not allowed',
+        { id: caseId, file: testCaseInfo.file }
+      );
+    }
+
+    const casePath = resolve(this.datasetPath, testCaseInfo.file);
+    const normalizedDatasetPath = resolve(this.datasetPath);
+
+    if (!casePath.startsWith(normalizedDatasetPath)) {
+      throw new GoldenDatasetValidationError(
+        'Invalid file path: resolved path is outside dataset directory',
+        { id: caseId, file: testCaseInfo.file, resolvedPath: casePath }
+      );
+    }
 
     if (!existsSync(casePath)) {
       throw new Error(
