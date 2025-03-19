@@ -1,0 +1,22 @@
+{
+  "id": "call_004",
+  "category": "account_update",
+  "difficulty": "easy",
+  "transcript": "Agent: Customer service, how can I help you?\n\nCustomer: Hi, I need to update my shipping address on my account.\n\nAgent: I can help with that. For security purposes, can you verify your email address?\n\nCustomer: It's sarah.jones@email.com\n\nAgent: Perfect, thank you Sarah. What's the new address you'd like to add?\n\nCustomer: It's 742 Maple Street, Austin, Texas, 78701.\n\nAgent: Got it. 742 Maple Street, Austin, TX 78701. I've updated your shipping address. Would you like to make this your default address?\n\nCustomer: Yes please.\n\nAgent: Done. Your new address is now set as the default. Is there anything else?\n\nCustomer: Nope, that's all. Thanks!",
+  "golden_summary": "Customer requested shipping address update. Agent verified identity via email (sarah.jones@email.com) and updated address to 742 Maple Street, Austin, TX 78701. New address set as default shipping address per customer request.",
+  "metadata": {
+    "sentiment": "neutral",
+    "resolution_status": "resolved",
+    "key_points": [
+      "Shipping address update requested",
+      "New address: 742 Maple Street, Austin, TX 78701",
+      "Set as default shipping address"
+    ]
+  },
+  "thresholds": {
+    "min_semantic_similarity": 0.85,
+    "min_length_words": 25,
+    "max_length_words": 80,
+    "required_terms": ["address", "update", "default"]
+  }
+}

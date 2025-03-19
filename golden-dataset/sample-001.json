@@ -1,0 +1,22 @@
+{
+  "id": "call_001",
+  "category": "password_reset",
+  "difficulty": "easy",
+  "transcript": "Agent: Thank you for calling customer support, how can I help you today?\n\nCustomer: Hi, I'm locked out of my account. I forgot my password and the reset link isn't working.\n\nAgent: I'm sorry to hear that. Let me help you with that. Can I have your email address please?\n\nCustomer: Sure, it's john.smith@email.com\n\nAgent: Thank you. I can see your account here. The issue is that your email address on file was slightly different - it had an extra dot. I've updated it now. Let me send you a new password reset link.\n\nCustomer: Oh, that makes sense. I recently changed my email.\n\nAgent: The reset link has been sent to john.smith@email.com. You should receive it within a few minutes. Is there anything else I can help you with?\n\nCustomer: No, that's all. Thank you so much!\n\nAgent: You're welcome! Have a great day.",
+  "golden_summary": "Customer was locked out of account due to forgotten password. Reset link wasn't working because email address on file was outdated. Agent updated the email address from incorrect format to john.smith@email.com and resent password reset link. Issue resolved successfully.",
+  "metadata": {
+    "sentiment": "positive",
+    "resolution_status": "resolved",
+    "key_points": [
+      "Account lockout due to forgotten password",
+      "Email address mismatch prevented reset",
+      "Agent corrected email and resent reset link"
+    ]
+  },
+  "thresholds": {
+    "min_semantic_similarity": 0.80,
+    "min_length_words": 30,
+    "max_length_words": 100,
+    "required_terms": ["password", "reset", "email"]
+  }
+}
