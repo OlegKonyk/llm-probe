@@ -1,0 +1,49 @@
+{
+  "dataset_version": "1.0.0",
+  "last_updated": "2024-01-15",
+  "total_cases": 5,
+  "categories": {
+    "password_reset": 1,
+    "billing_inquiry": 1,
+    "product_issue": 1,
+    "account_update": 1,
+    "general_inquiry": 1
+  },
+  "difficulty_distribution": {
+    "easy": 2,
+    "medium": 2,
+    "hard": 1
+  },
+  "test_cases": [
+    {
+      "id": "call_001",
+      "file": "sample-001.json",
+      "category": "password_reset",
+      "difficulty": "easy"
+    },
+    {
+      "id": "call_002",
+      "file": "sample-002.json",
+      "category": "billing_inquiry",
+      "difficulty": "medium"
+    },
+    {
+      "id": "call_003",
+      "file": "sample-003.json",
+      "category": "product_issue",
+      "difficulty": "hard"
+    },
+    {
+      "id": "call_004",
+      "file": "sample-004.json",
+      "category": "account_update",
+      "difficulty": "easy"
+    },
+    {
+      "id": "call_005",
+      "file": "sample-005.json",
+      "category": "general_inquiry",
+      "difficulty": "medium"
+    }
+  ]
+}
