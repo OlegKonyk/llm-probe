@@ -1,0 +1,23 @@
+{
+  "id": "call_003",
+  "category": "product_issue",
+  "difficulty": "hard",
+  "transcript": "Agent: Thank you for calling product support. How may I assist you?\n\nCustomer: Yeah, hi. I'm really frustrated. I bought your wireless headphones three weeks ago and they keep disconnecting every few minutes. It's unusable.\n\nAgent: I'm very sorry to hear you're experiencing that issue. That's definitely not the experience we want you to have. Let me help troubleshoot this. Have you tried resetting the headphones?\n\nCustomer: Yes, I've tried everything. I've reset them, updated the firmware, tried different devices. Nothing works.\n\nAgent: I appreciate you trying those steps. Can I have your order number so I can look up your purchase?\n\nCustomer: It's ORD-445821.\n\nAgent: Thank you. I see you purchased these on March 15th. Since troubleshooting hasn't resolved the issue and you're within our 30-day return window, I have two options for you. We can either send you a replacement pair with expedited shipping, or process a full refund.\n\nCustomer: Honestly, at this point I just want my money back. I don't trust this product anymore.\n\nAgent: I completely understand. I'll process a full refund to your original payment method. You'll see it within 3-5 business days. I'll also email you a prepaid return shipping label. Just send the headphones back in any box.\n\nCustomer: Okay, that works. Will I get the full amount back?\n\nAgent: Yes, you'll receive a full refund of $149.99. Is there anything else I can help you with?\n\nCustomer: No, that's it. Thanks for handling this quickly.\n\nAgent: You're welcome, and again, I apologize for the inconvenience.",
+  "golden_summary": "Customer reported wireless headphones purchased 3 weeks ago constantly disconnecting despite troubleshooting (reset, firmware update, multiple devices tested). Agent verified purchase (ORD-445821, March 15th) and offered replacement or refund within 30-day window. Customer declined replacement due to lost confidence in product. Agent processed full refund of $149.99 (3-5 business days) and provided prepaid return shipping label.",
+  "metadata": {
+    "sentiment": "negative",
+    "resolution_status": "resolved",
+    "key_points": [
+      "Defective wireless headphones with persistent disconnection issues",
+      "Customer attempted all troubleshooting steps",
+      "Full refund processed ($149.99)",
+      "Prepaid return label provided"
+    ]
+  },
+  "thresholds": {
+    "min_semantic_similarity": 0.80,
+    "min_length_words": 50,
+    "max_length_words": 130,
+    "required_terms": ["headphones", "disconnect", "refund", "troubleshoot"]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "call_005",
+  "category": "general_inquiry",
+  "difficulty": "medium",
+  "transcript": "Agent: Thank you for calling. How may I help you today?\n\nCustomer: Hi, I'm thinking about upgrading my plan but I want to understand the differences between the Premium and Business tiers.\n\nAgent: I'd be happy to explain the differences. The Premium plan at $29/month includes unlimited storage, priority support, and up to 10 team members. The Business plan at $49/month includes everything in Premium plus advanced analytics, API access, and up to 50 team members. What's your primary use case?\n\nCustomer: We're a small marketing agency with about 8 people right now, but we're planning to hire 5 more people in the next quarter. We definitely need the analytics.\n\nAgent: Based on that, I'd recommend the Business plan. With your growth plans, you'll exceed the 10-user limit on Premium soon, and the advanced analytics seem important for your work. Plus, the API access could be valuable for integrating with your other tools.\n\nCustomer: That makes sense. Can I switch plans mid-month or do I need to wait?\n\nAgent: You can switch anytime. We'll prorate your current plan and you'll only pay the difference for the remainder of this billing cycle.\n\nCustomer: Perfect. Let me discuss with my team and we'll call back to upgrade.\n\nAgent: Sounds good! When you're ready, just call us or you can upgrade directly through your account settings online. Anything else I can help with?\n\nCustomer: No, that's very helpful. Thank you!",
+  "golden_summary": "Customer inquired about differences between Premium ($29/month, 10 users, unlimited storage, priority support) and Business plans ($49/month, 50 users, includes analytics and API access). Customer is small marketing agency with 8 employees planning to hire 5 more. Agent recommended Business plan based on growth trajectory and analytics needs. Customer will discuss with team before upgrading. Agent noted prorated billing available for mid-cycle plan changes.",
+  "metadata": {
+    "sentiment": "positive",
+    "resolution_status": "pending_customer_action",
+    "key_points": [
+      "Comparing Premium vs Business plan features",
+      "8-person agency planning to grow to 13",
+      "Needs advanced analytics",
+      "Agent recommended Business plan",
+      "Customer will discuss with team before deciding"
+    ]
+  },
+  "thresholds": {
+    "min_semantic_similarity": 0.78,
+    "min_length_words": 50,
+    "max_length_words": 140,
+    "required_terms": ["premium", "business", "analytics", "upgrade"]
+  }
+}
