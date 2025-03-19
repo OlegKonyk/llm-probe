@@ -1,0 +1,23 @@
+{
+  "id": "call_002",
+  "category": "billing_inquiry",
+  "difficulty": "medium",
+  "transcript": "Agent: Thank you for calling billing support. How can I help you today?\n\nCustomer: Hi, I just got my bill and it's $50 more than usual. I don't understand why.\n\nAgent: I'd be happy to look into that for you. Can I have your account number?\n\nCustomer: Sure, it's 78392.\n\nAgent: Thank you. I'm looking at your account now. I can see the increase is due to overages on your data plan. You used 15GB over your 10GB limit last month.\n\nCustomer: Oh no, really? I didn't realize I went over. Is there any way to get that waived? I just started a new job and was using my phone more for work.\n\nAgent: I understand. Let me see what I can do. Since this is your first overage in over two years, I can apply a one-time courtesy credit of $25 to your account. For future months, I'd recommend upgrading to our 20GB plan which would actually save you money if you continue this usage pattern.\n\nCustomer: That would be great! Can we switch to that plan now?\n\nAgent: Absolutely. I've upgraded your plan to 20GB starting next billing cycle, and I've applied the $25 credit to your current bill.\n\nCustomer: Thank you so much for your help!\n\nAgent: You're very welcome. Is there anything else I can help you with today?\n\nCustomer: No, that's everything. Thanks again!",
+  "golden_summary": "Customer called about unexpected $50 billing increase. Agent identified cause as 15GB data overage charges (exceeded 10GB plan limit). Customer requested waiver due to new job requiring more data usage. Agent applied one-time $25 courtesy credit (first overage in 2+ years) and upgraded customer to 20GB plan starting next billing cycle to prevent future overages.",
+  "metadata": {
+    "sentiment": "positive",
+    "resolution_status": "resolved",
+    "key_points": [
+      "Bill increased $50 due to data overages",
+      "Customer used 15GB on 10GB plan",
+      "Agent credited $25 as courtesy (first overage)",
+      "Upgraded to 20GB plan to prevent future issues"
+    ]
+  },
+  "thresholds": {
+    "min_semantic_similarity": 0.82,
+    "min_length_words": 40,
+    "max_length_words": 120,
+    "required_terms": ["billing", "overage", "credit", "upgrade"]
+  }
+}
