@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { validateEnv } from './config/env-validator.js';
+import { summarizationRouter } from './api/summarization.js';
 
 const config = validateEnv();
 const app = express();
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+app.use('/api/v1', summarizationRouter);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
