@@ -65,6 +65,8 @@ describe('GoldenDatasetLoader', () => {
 
       expect(() => loader.loadTestCase('malicious')).toThrow(GoldenDatasetValidationError);
       expect(() => loader.loadTestCase('malicious')).toThrow(/absolute paths and parent directory traversal/);
+
+      loader.clearCache();
     });
 
     it('should reject absolute paths', () => {
@@ -77,6 +79,8 @@ describe('GoldenDatasetLoader', () => {
 
       expect(() => loader.loadTestCase('malicious')).toThrow(GoldenDatasetValidationError);
       expect(() => loader.loadTestCase('malicious')).toThrow(/absolute paths and parent directory traversal/);
+
+      loader.clearCache();
     });
   });
 
