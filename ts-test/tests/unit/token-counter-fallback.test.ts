@@ -23,7 +23,6 @@ describe('TokenCounter Fallback', () => {
       const tokens = counter.countTokens(chineseText);
 
       const charCount = chineseText.trim().length;
-      // CJK languages: ~1 token per character in cl100k_base
       const expected = Math.ceil(charCount * 1.0);
       expect(tokens).toBe(expected);
     });
@@ -36,7 +35,6 @@ describe('TokenCounter Fallback', () => {
       const tokens = counter.countTokens(japaneseText);
 
       const charCount = japaneseText.trim().length;
-      // CJK languages: ~1 token per character in cl100k_base
       const expected = Math.ceil(charCount * 1.0);
       expect(tokens).toBe(expected);
     });
@@ -78,7 +76,6 @@ describe('TokenCounter Fallback', () => {
       const tokens = counter.countTokens(text);
 
       const charCount = text.length;
-      // CJK languages: ~1 token per character in cl100k_base
       expect(tokens).toBe(Math.ceil(charCount * 1.0));
     });
 
@@ -97,12 +94,11 @@ describe('TokenCounter Fallback', () => {
       const counter = new TokenCounter();
       (counter as any).encoder = null;
 
-      // Long German word (>15 chars per word) - should use word-based approximation
       const text = 'Donaudampfschifffahrtsgesellschaftskapitän';
       const tokens = counter.countTokens(text);
 
-      const wordCount = text.split(/\s+/).length; // 1 word
-      expect(tokens).toBe(Math.ceil(wordCount * 1.3)); // 2 tokens, not 43
+      const wordCount = text.split(/\s+/).length;
+      expect(tokens).toBe(Math.ceil(wordCount * 1.3));
     });
 
     it('should NOT treat base64 strings as CJK', () => {
@@ -112,10 +108,9 @@ describe('TokenCounter Fallback', () => {
       const base64 = 'SGVsbG8gV29ybGQhIFRoaXMgaXMgYSB0ZXN0IG1lc3NhZ2U=';
       const tokens = counter.countTokens(base64);
 
-      const wordCount = base64.split(/\s+/).length; // 1 word
-      // Should use word-based approximation, not per-character
+      const wordCount = base64.split(/\s+/).length;
       expect(tokens).toBe(Math.ceil(wordCount * 1.3));
-      expect(tokens).toBeLessThan(10); // Not ~48 tokens
+      expect(tokens).toBeLessThan(10);
     });
 
     it('should NOT treat URLs as CJK', () => {
@@ -125,9 +120,9 @@ describe('TokenCounter Fallback', () => {
       const url = 'https://example.com/api/v1/users/authentication-token';
       const tokens = counter.countTokens(url);
 
-      const wordCount = url.split(/\s+/).length; // 1 word
+      const wordCount = url.split(/\s+/).length;
       expect(tokens).toBe(Math.ceil(wordCount * 1.3));
-      expect(tokens).toBeLessThan(10); // Not ~52 tokens
+      expect(tokens).toBeLessThan(10);
     });
   });
 
@@ -136,14 +131,11 @@ describe('TokenCounter Fallback', () => {
       const counter = new TokenCounter();
       const chineseText = '这是一个测试文本用于验证令牌计数器的回退机制';
 
-      // Real tiktoken count with encoder enabled
       const actualTokens = counter.countTokens(chineseText);
 
-      // Fallback approximation (disable encoder)
       (counter as any).encoder = null;
       const fallbackTokens = counter.countTokens(chineseText);
 
-      // Fallback should be within 30% of actual (approximations won't be perfect)
       const ratio = fallbackTokens / actualTokens;
       expect(ratio).toBeGreaterThan(0.7);
       expect(ratio).toBeLessThan(1.3);
@@ -169,8 +161,6 @@ describe('TokenCounter Fallback', () => {
 
     it('should not severely undercount CJK text', () => {
       const counter = new TokenCounter();
-
-      // The exact text from the review feedback
       const chineseText = '这是一个测试文本用于验证令牌计数器的回退机制';
 
       const actualTokens = counter.countTokens(chineseText);
@@ -178,7 +168,6 @@ describe('TokenCounter Fallback', () => {
       (counter as any).encoder = null;
       const fallbackTokens = counter.countTokens(chineseText);
 
-      // Fallback must not undercount by more than 50%
       expect(fallbackTokens).toBeGreaterThan(actualTokens * 0.5);
 
       counter.free();

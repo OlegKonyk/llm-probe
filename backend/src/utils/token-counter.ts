@@ -50,13 +50,31 @@ export class TokenCounter {
     return this.approximateTokens(text);
   }
 
+  private isCJKText(text: string): boolean {
+    const cjkRegex = /[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/;
+
+    let cjkCharCount = 0;
+    for (const char of text) {
+      if (cjkRegex.test(char)) {
+        cjkCharCount++;
+      }
+    }
+
+    return (cjkCharCount / text.length) > 0.3;
+  }
+
   private approximateTokens(text: string): number {
     const trimmed = text.trim();
     if (trimmed.length === 0) {
       return 0;
     }
-    const words = trimmed.split(/\s+/).length;
-    return Math.ceil(words * AVG_TOKENS_PER_WORD);
+
+    if (this.isCJKText(trimmed)) {
+      return Math.ceil(trimmed.length * 1.0);
+    }
+
+    const wordCount = trimmed.split(/\s+/).length;
+    return Math.ceil(wordCount * AVG_TOKENS_PER_WORD);
   }
 
   free(): void {

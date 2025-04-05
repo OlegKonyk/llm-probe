@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  // Ollama Configuration
   OLLAMA_HOST: z
     .string()
     .url('OLLAMA_HOST must be a valid URL')
@@ -12,14 +11,12 @@ const envSchema = z.object({
     .min(1, 'OLLAMA_MODEL cannot be empty')
     .default('llama3.2:latest'),
 
-  // Server Configuration
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
 
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
 
-  // CORS Configuration
   ALLOWED_ORIGINS: z
     .string()
     .default('http://localhost:3000,http://localhost:5173')
@@ -36,10 +33,15 @@ const envSchema = z.object({
       'ALLOWED_ORIGINS must be comma-separated valid URLs'
     ),
 
-  // Rate Limiting Configuration
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
 
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
+
+  // Set to true when behind reverse proxy (Nginx, ALB, etc.)
+  TRUST_PROXY: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
 });
 
 export type ValidatedEnv = z.infer<typeof envSchema>;
@@ -54,6 +56,7 @@ export function validateEnv(): ValidatedEnv {
       ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
       RATE_LIMIT_WINDOW_MS: process.env.RATE_LIMIT_WINDOW_MS,
       RATE_LIMIT_MAX_REQUESTS: process.env.RATE_LIMIT_MAX_REQUESTS,
+      TRUST_PROXY: process.env.TRUST_PROXY,
     });
 
     return validated;
