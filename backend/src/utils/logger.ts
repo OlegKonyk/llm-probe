@@ -17,7 +17,6 @@ class Logger {
   };
 
   constructor() {
-    // Validate LOG_LEVEL against known values
     const envLevel = process.env.LOG_LEVEL?.toLowerCase();
 
     if (envLevel && LOG_LEVELS.includes(envLevel as LogLevel)) {
