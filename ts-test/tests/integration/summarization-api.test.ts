@@ -139,9 +139,7 @@ describe('Summarization API', () => {
 
   describe('Rate Limiting', () => {
     it('should enforce rate limits with sequential requests', async () => {
-      // Use a low threshold to test rate limiting without overwhelming the server
-      // Backend should be started with RATE_LIMIT_MAX_REQUESTS=5 for this test
-      const maxRequests = 7; // Exceed limit of 5
+      const maxRequests = 7;
       const responses: Response[] = [];
 
       for (let i = 0; i < maxRequests; i++) {
@@ -155,8 +153,42 @@ describe('Summarization API', () => {
         responses.push(response);
       }
 
-      const rateLimited = responses.some(r => r.status === 429);
-      expect(rateLimited).toBe(true);
+      const rateLimitedResponse = responses.find(r => r.status === 429);
+      expect(rateLimitedResponse).toBeDefined();
+
+      if (rateLimitedResponse) {
+        const data = await rateLimitedResponse.json() as ErrorResponse;
+        expect(data).toHaveProperty('error');
+        expect(data.error).toBe('Too Many Requests');
+      }
+    }, 30000);
+
+    it('should not trust X-Forwarded-For header by default', async () => {
+      const maxRequests = 7;
+      const responses: Response[] = [];
+
+      for (let i = 0; i < maxRequests; i++) {
+        const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Forwarded-For': `192.0.2.${i}`,
+          },
+          body: JSON.stringify({
+            transcript: 'Test transcript with spoofed IP',
+          }),
+        });
+        responses.push(response);
+      }
+
+      const rateLimitedResponse = responses.find(r => r.status === 429);
+      expect(rateLimitedResponse).toBeDefined();
+
+      if (rateLimitedResponse) {
+        const data = await rateLimitedResponse.json() as ErrorResponse;
+        expect(data).toHaveProperty('error');
+        expect(data.error).toBe('Too Many Requests');
+      }
     }, 30000);
   });
 
