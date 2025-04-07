@@ -4,7 +4,8 @@
   "description": "Learning project: Testing LLM-powered call summarization service",
   "private": true,
   "workspaces": [
-    "backend"
+    "backend",
+    "ts-test"
   ],
   "scripts": {
     "backend": "npm run dev --workspace=backend"
