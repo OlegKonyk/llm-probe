@@ -24,3 +24,6 @@ jobs:
 
       - name: Type check backend
         run: npm run type-check --workspace=backend
+
+      - name: Run unit tests
+        run: npm test --workspace=ts-test -- tests/unit
