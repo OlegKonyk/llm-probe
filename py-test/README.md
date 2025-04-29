@@ -47,11 +47,10 @@ cd py-test
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies for development (includes testing tools)
+pip install -e .[dev]
 
 # Run tests
-export PYTHONPATH=$PYTHONPATH:$(pwd)
 pytest tests/ -v
 ```
 
@@ -223,8 +222,7 @@ py-test/
 │   └── unit/
 │       └── test_text_similarity.py  # 25 passing tests
 ├── venv/                            # Virtual environment
-├── requirements.txt                 # Dependencies
-├── pyproject.toml                   # Project configuration
+├── pyproject.toml                   # Project configuration & dependencies
 └── README.md                        # This file
 ```
 
