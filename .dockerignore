@@ -44,6 +44,9 @@ docs/
 articles/
 context/
 
+# Infrastructure (CDK)
+infrastructure/
+
 # Python
 __pycache__/
 *.py[cod]
