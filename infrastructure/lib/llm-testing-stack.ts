@@ -6,6 +6,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as path from 'path';
 import { Construct } from 'constructs';
 
 export interface LlmTestingStackProps extends cdk.StackProps {
@@ -114,7 +115,7 @@ export class LlmTestingStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
-        resources: [`arn:aws:bedrock:${this.region}::foundation-model/*`],
+        resources: [`arn:aws:bedrock:${this.region}::foundation-model/${bedrockModel}`],
       })
     );
 
@@ -138,7 +139,7 @@ export class LlmTestingStack extends cdk.Stack {
 
     // Container Definition
     const container = taskDefinition.addContainer('backend', {
-      image: ecs.ContainerImage.fromEcrRepository(repository, 'latest'),
+      image: ecs.ContainerImage.fromAsset(path.join(__dirname, '..', '..')),
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: 'backend',
         logGroup,
@@ -154,7 +155,7 @@ export class LlmTestingStack extends cdk.Stack {
         API_KEY_AUTH_ENABLED: 'true',
       },
       healthCheck: {
-        command: ['CMD-SHELL', 'node -e "require(\'http\').get(\'http://localhost:3000/health\', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"'],
+        command: ['CMD-SHELL', 'node -e "require(\'http\').get(\'http://localhost:3000/health\', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on(\'error\', () => process.exit(1))"'],
         interval: cdk.Duration.seconds(30),
         timeout: cdk.Duration.seconds(10),
         retries: 3,
