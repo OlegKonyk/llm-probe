@@ -322,18 +322,15 @@ def contains_required_terms(
     # Case-insensitive matching with word boundaries
     text_lower = text.lower()
 
-    # Find which required terms are present (whole word match using regex)
+    # Find which required terms are present and missing (single loop for performance)
     # Use word boundaries (\b) to avoid false positives like "cat" in "caterpillar"
-    found = [
-        term for term in required_terms
-        if re.search(r'\b' + re.escape(term.lower()) + r'\b', text_lower)
-    ]
-
-    # Find which required terms are missing
-    missing = [
-        term for term in required_terms
-        if not re.search(r'\b' + re.escape(term.lower()) + r'\b', text_lower)
-    ]
+    found = []
+    missing = []
+    for term in required_terms:
+        if re.search(r'\b' + re.escape(term.lower()) + r'\b', text_lower):
+            found.append(term)
+        else:
+            missing.append(term)
 
     return {
         'passed': len(found) == len(required_terms),
