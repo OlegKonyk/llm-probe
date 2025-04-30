@@ -1,0 +1,30 @@
+{
+  "name": "infrastructure",
+  "version": "1.0.0",
+  "description": "AWS CDK infrastructure for LLM Testing Framework",
+  "main": "lib/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy",
+    "synth": "cdk synth",
+    "diff": "cdk diff"
+  },
+  "keywords": ["aws", "cdk", "ecs", "bedrock", "infrastructure"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "aws-cdk": "^2.114.0",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.114.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  }
+}
