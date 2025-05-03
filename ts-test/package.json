@@ -6,7 +6,12 @@
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=tests/unit",
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=tests/integration",
+    "test:component": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=tests/component",
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=tests/e2e",
+    "test:regression": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=tests/regression"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
