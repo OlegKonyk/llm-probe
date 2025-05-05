@@ -67,223 +67,103 @@ describe('End-to-End Tests - Live Backend', () => {
   });
 
   describe('Golden Dataset E2E Validation', () => {
-    it('should generate high-quality summary for call_001 (password reset)', async () => {
-      if (!backendAvailable) {
-        console.warn('⚠️  Skipping: Backend not available');
-        return;
-      }
+    const testCases = [
+      {
+        callId: 'call_001',
+        description: 'password reset',
+        options: { maxLength: 100, includeKeyPoints: true, includeSentiment: false },
+        expectSafe: true,
+        logSecurity: true,
+      },
+      {
+        callId: 'call_002',
+        description: 'billing inquiry',
+        options: { maxLength: 100 },
+        expectSafe: true,
+        logSecurity: false,
+      },
+      {
+        callId: 'call_003',
+        description: 'product issue',
+        options: { maxLength: 150, includeSentiment: true },
+        expectSafe: true,
+        logSecurity: false,
+      },
+      {
+        callId: 'call_004',
+        description: 'account update',
+        options: { maxLength: 75 },
+        expectSafe: false,
+        logSecurity: true,
+        checkRiskScore: true,
+      },
+      {
+        callId: 'call_005',
+        description: 'general inquiry',
+        options: { maxLength: 150, includeKeyPoints: true },
+        expectSafe: true,
+        logSecurity: false,
+      },
+    ];
 
-      const testCase = loader.loadTestCase('call_001');
-      const metric = performanceCollector.startRequest();
+    it.each(testCases)(
+      'should generate high-quality summary for $callId ($description)',
+      async ({ callId, options, expectSafe, logSecurity, checkRiskScore }) => {
+        if (!backendAvailable) {
+          console.warn('⚠️  Skipping: Backend not available');
+          return;
+        }
 
-     
-      const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
-          transcript: testCase.transcript,
-          options: {
-            maxLength: 100,
-            includeKeyPoints: true,
-            includeSentiment: false,
-          },
-        }),
-      });
+        const testCase = loader.loadTestCase(callId);
+        const metric = performanceCollector.startRequest();
 
-      const data = await response.json() as SummarizeResponse;
-      expect(response.status).toBe(200);
-      expect(data).toHaveProperty('summary');
+        const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+          body: JSON.stringify({
+            transcript: testCase.transcript,
+            options,
+          }),
+        });
 
-     
-      metric.end({
-        inputTokens: data.metadata.tokens_used,
-        outputTokens: data.metadata.tokens_used,
-        model: data.metadata.model,
-      });
+        const data = (await response.json()) as SummarizeResponse;
+        expect(response.status).toBe(200);
+        if (callId === 'call_001') {
+          expect(data).toHaveProperty('summary');
+        }
 
-     
-      const evaluation = evaluator.evaluate(data.summary, testCase);
+        metric.end({
+          inputTokens: 0, // Backend doesn't provide input tokens yet
+          outputTokens: data.metadata.tokens_used,
+          model: data.metadata.model,
+        });
 
-     
-      const securityResult = securityDetector.analyzeOutput(data.summary);
+        const evaluation = evaluator.evaluate(data.summary, testCase);
+        const securityResult = securityDetector.analyzeOutput(data.summary);
 
-     
-      console.log(`\n📊 Call 001 Results:`);
-      console.log(`   Summary: ${data.summary.substring(0, 100)}...`);
-      console.log(`   Similarity: ${evaluation.similarity.toFixed(2)}`);
-      console.log(`   Latency: ${data.metadata.latency_ms}ms`);
-      console.log(`   Security: ${securityResult.safe ? '✅ Safe' : '❌ Violations'}`);
+        const callNumber = callId.split('_')[1];
+        console.log(`\n📊 Call ${callNumber} Results:`);
+        console.log(`   Summary: ${data.summary.substring(0, 100)}...`);
+        console.log(`   Similarity: ${evaluation.similarity.toFixed(2)}`);
+        console.log(`   Latency: ${data.metadata.latency_ms}ms`);
+        if (logSecurity) {
+          console.log(`   Security: ${securityResult.safe ? '✅ Safe' : '❌ Violations'}`);
+          if (!securityResult.safe) {
+            console.log(`   Violations: ${JSON.stringify(securityResult.violations, null, 2)}`);
+          }
+        }
 
-      expect(evaluation.similarity).toBeGreaterThan(0.33);
-      expect(data.metadata.latency_ms).toBeLessThan(90000);
-      expect(securityResult.safe).toBe(true);
-    }, 120000);
+        expect(evaluation.similarity).toBeGreaterThan(0.33);
+        expect(data.metadata.latency_ms).toBeLessThan(90000);
 
-    it('should generate high-quality summary for call_002 (billing inquiry)', async () => {
-      if (!backendAvailable) {
-        console.warn('⚠️  Skipping: Backend not available');
-        return;
-      }
-
-      const testCase = loader.loadTestCase('call_002');
-      const metric = performanceCollector.startRequest();
-
-      const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
-          transcript: testCase.transcript,
-          options: { maxLength: 100 },
-        }),
-      });
-
-      const data = await response.json() as SummarizeResponse;
-      expect(response.status).toBe(200);
-
-      metric.end({
-        inputTokens: data.metadata.tokens_used,
-        outputTokens: data.metadata.tokens_used,
-        model: data.metadata.model,
-      });
-
-      const evaluation = evaluator.evaluate(data.summary, testCase);
-      const securityResult = securityDetector.analyzeOutput(data.summary);
-
-      console.log(`\n📊 Call 002 Results:`);
-      console.log(`   Summary: ${data.summary.substring(0, 100)}...`);
-      console.log(`   Similarity: ${evaluation.similarity.toFixed(2)}`);
-      console.log(`   Latency: ${data.metadata.latency_ms}ms`);
-
-      expect(evaluation.similarity).toBeGreaterThan(0.33);
-      expect(data.metadata.latency_ms).toBeLessThan(90000);
-      expect(securityResult.safe).toBe(true);
-    }, 120000);
-
-    it('should generate high-quality summary for call_003 (product issue)', async () => {
-      if (!backendAvailable) {
-        console.warn('⚠️  Skipping: Backend not available');
-        return;
-      }
-
-      const testCase = loader.loadTestCase('call_003');
-      const metric = performanceCollector.startRequest();
-
-      const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
-          transcript: testCase.transcript,
-          options: { maxLength: 150, includeSentiment: true },
-        }),
-      });
-
-      const data = await response.json() as SummarizeResponse;
-      expect(response.status).toBe(200);
-
-      metric.end({
-        inputTokens: data.metadata.tokens_used,
-        outputTokens: data.metadata.tokens_used,
-        model: data.metadata.model,
-      });
-
-      const evaluation = evaluator.evaluate(data.summary, testCase);
-      const securityResult = securityDetector.analyzeOutput(data.summary);
-
-      console.log(`\n📊 Call 003 Results:`);
-      console.log(`   Summary: ${data.summary.substring(0, 100)}...`);
-      console.log(`   Similarity: ${evaluation.similarity.toFixed(2)}`);
-      console.log(`   Latency: ${data.metadata.latency_ms}ms`);
-
-      expect(evaluation.similarity).toBeGreaterThan(0.33);
-      expect(data.metadata.latency_ms).toBeLessThan(90000);
-      expect(securityResult.safe).toBe(true);
-    }, 120000);
-
-    it('should generate high-quality summary for call_004 (account update)', async () => {
-      if (!backendAvailable) {
-        console.warn('⚠️  Skipping: Backend not available');
-        return;
-      }
-
-      const testCase = loader.loadTestCase('call_004');
-      const metric = performanceCollector.startRequest();
-
-      const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
-          transcript: testCase.transcript,
-          options: { maxLength: 75 },
-        }),
-      });
-
-      const data = await response.json() as SummarizeResponse;
-      expect(response.status).toBe(200);
-
-      metric.end({
-        inputTokens: data.metadata.tokens_used,
-        outputTokens: data.metadata.tokens_used,
-        model: data.metadata.model,
-      });
-
-      const evaluation = evaluator.evaluate(data.summary, testCase);
-      const securityResult = securityDetector.analyzeOutput(data.summary);
-
-      console.log(`\n📊 Call 004 Results:`);
-      console.log(`   Summary: ${data.summary.substring(0, 100)}...`);
-      console.log(`   Similarity: ${evaluation.similarity.toFixed(2)}`);
-      console.log(`   Latency: ${data.metadata.latency_ms}ms`);
-      console.log(`   Security: ${securityResult.safe ? '✅ Safe' : '❌ Violations'}`);
-      if (!securityResult.safe) {
-        console.log(`   Violations: ${JSON.stringify(securityResult.violations, null, 2)}`);
-      }
-
-      expect(evaluation.similarity).toBeGreaterThan(0.33);
-      expect(data.metadata.latency_ms).toBeLessThan(90000);
-     
-     
-      expect(securityResult.riskScore).toBeLessThan(50);
-    }, 120000);
-
-    it('should generate high-quality summary for call_005 (general inquiry)', async () => {
-      if (!backendAvailable) {
-        console.warn('⚠️  Skipping: Backend not available');
-        return;
-      }
-
-      const testCase = loader.loadTestCase('call_005');
-      const metric = performanceCollector.startRequest();
-
-      const response = await fetch(`${BASE_URL}/api/v1/summarize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify({
-          transcript: testCase.transcript,
-          options: { maxLength: 150, includeKeyPoints: true },
-        }),
-      });
-
-      const data = await response.json() as SummarizeResponse;
-      expect(response.status).toBe(200);
-
-      metric.end({
-        inputTokens: data.metadata.tokens_used,
-        outputTokens: data.metadata.tokens_used,
-        model: data.metadata.model,
-      });
-
-      const evaluation = evaluator.evaluate(data.summary, testCase);
-      const securityResult = securityDetector.analyzeOutput(data.summary);
-
-      console.log(`\n📊 Call 005 Results:`);
-      console.log(`   Summary: ${data.summary.substring(0, 100)}...`);
-      console.log(`   Similarity: ${evaluation.similarity.toFixed(2)}`);
-      console.log(`   Latency: ${data.metadata.latency_ms}ms`);
-
-      expect(evaluation.similarity).toBeGreaterThan(0.33);
-      expect(data.metadata.latency_ms).toBeLessThan(90000);
-      expect(securityResult.safe).toBe(true);
-    }, 120000);
+        if (checkRiskScore) {
+          expect(securityResult.riskScore).toBeLessThan(50);
+        } else if (expectSafe) {
+          expect(securityResult.safe).toBe(true);
+        }
+      },
+      120000
+    );
   });
 
   describe('Performance Metrics', () => {
@@ -400,7 +280,7 @@ describe('End-to-End Tests - Live Backend', () => {
       });
 
       expect(response.status).toBe(400);
-      const data = await response.json() as SummarizeResponse;
+      const data = await response.json() as ErrorResponse;
       expect(data).toHaveProperty('error');
     });
 
