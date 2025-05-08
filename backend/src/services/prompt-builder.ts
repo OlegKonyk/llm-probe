@@ -37,4 +37,13 @@ Summary:`;
 
     return prompt;
   }
+
+  /**
+   * Estimates token count for cost tracking (~4 chars per token)
+   * @param text - Text to estimate
+   * @returns Estimated token count
+   */
+  getTokenCount(text: string): number {
+    return Math.ceil(text.length / 4);
+  }
 }
