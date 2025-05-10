@@ -90,7 +90,7 @@ class TestMetricsAggregator:
     def test_check_for_regressions_similarity(self, aggregator):
         """Test regression detection for similarity"""
         # Record baseline runs with good similarity
-        for i in range(5):
+        for _ in range(5):
             result = TestRunResult(
                 timestamp=datetime.now(),
                 test_suite='test',
@@ -125,7 +125,7 @@ class TestMetricsAggregator:
     def test_check_for_regressions_latency(self, aggregator):
         """Test regression detection for latency"""
         # Record baseline runs
-        for i in range(5):
+        for _i in range(5):
             result = TestRunResult(
                 timestamp=datetime.now(),
                 test_suite='test',
@@ -160,7 +160,7 @@ class TestMetricsAggregator:
     def test_check_for_regressions_pass_rate(self, aggregator):
         """Test regression detection for pass rate"""
         # Record baseline runs with high pass rate
-        for i in range(5):
+        for _i in range(5):
             result = TestRunResult(
                 timestamp=datetime.now(),
                 test_suite='test',
@@ -250,7 +250,7 @@ class TestMetricsAggregator:
     def test_generate_dashboard(self, aggregator):
         """Test dashboard generation"""
         # Record some test runs
-        for i in range(5):
+        for _i in range(5):
             result = TestRunResult(
                 timestamp=datetime.now(),
                 test_suite='e2e',
