@@ -175,7 +175,7 @@ class MetricsAggregator:
     def _load_history(self) -> list[TestRunResult]:
         """Load test run history"""
         try:
-            with open(self.history_file) as f:
+            with open(self.history_file, encoding='utf-8') as f:
                 data = json.load(f)
 
             # Validate that we have an array
@@ -214,7 +214,7 @@ class MetricsAggregator:
             data['timestamp'] = result.timestamp.isoformat()
             serializable.append(data)
 
-        with open(self.history_file, 'w') as f:
+        with open(self.history_file, 'w', encoding='utf-8') as f:
             json.dump(serializable, f, indent=2)
 
     def get_recent_runs(self, count: int = DEFAULT_RECENT_RUNS) -> list[TestRunResult]:
@@ -336,7 +336,7 @@ class MetricsAggregator:
             return []
 
         # Check similarity regression
-        if latest.avg_similarity is not None:
+        if latest.avg_similarity is not None and baseline.avg_similarity > 0:
             sim_change = (latest.avg_similarity - baseline.avg_similarity) / baseline.avg_similarity
 
             if sim_change < -self.thresholds.similarity_drop:
@@ -443,7 +443,7 @@ Test Suite: {latest.test_suite or 'unknown'}
 
 Current Status:
   Tests: {latest.passed}/{latest.total_tests} passed """
-        pass_pct = latest.passed / latest.total_tests * 100
+        pass_pct = (latest.passed / latest.total_tests * 100) if latest.total_tests > 0 else 0.0
         report += f"({pass_pct:.1f}%)\n"
         report += f"""  Duration: {latest.duration / 1000:.1f}s
 """

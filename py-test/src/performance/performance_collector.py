@@ -181,7 +181,7 @@ class PerformanceCollector:
 
         metric = PerformanceMetric(
             request_id=request_id,
-            start_time=time.time() * 1000,  # milliseconds
+            start_time=time.monotonic() * 1000,  # milliseconds
             success=True
         )
 
@@ -207,7 +207,7 @@ class PerformanceCollector:
         if not metric:
             raise ValueError(f"Request {request_id} not found")
 
-        metric.end_time = time.time() * 1000  # milliseconds
+        metric.end_time = time.monotonic() * 1000  # milliseconds
         metric.latency = metric.end_time - metric.start_time
 
         if error:
