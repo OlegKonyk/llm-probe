@@ -38,7 +38,7 @@ import os
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal, Optional, cast
 
 from ..utils.logger import logger
 
@@ -340,7 +340,8 @@ class MetricsAggregator:
             sim_change = (latest.avg_similarity - baseline.avg_similarity) / baseline.avg_similarity
 
             if sim_change < -self.thresholds.similarity_drop:
-                severity = (
+                severity = cast(
+                    Literal['warning', 'critical'],
                     'critical'
                     if sim_change <= -CRITICAL_SIMILARITY_DROP_THRESHOLD
                     else 'warning'
@@ -365,7 +366,8 @@ class MetricsAggregator:
             latency_change = (latest.avg_latency - baseline.avg_latency) / baseline.avg_latency
 
             if latency_change > self.thresholds.latency_increase:
-                severity = (
+                severity = cast(
+                    Literal['warning', 'critical'],
                     'critical'
                     if latency_change >= CRITICAL_LATENCY_INCREASE_THRESHOLD
                     else 'warning'
@@ -390,7 +392,8 @@ class MetricsAggregator:
         pass_rate_change = current_pass_rate - baseline.avg_pass_rate
 
         if pass_rate_change < -self.thresholds.pass_rate_drop:
-            severity = (
+            severity = cast(
+                Literal['warning', 'critical'],
                 'critical'
                 if pass_rate_change < -CRITICAL_PASS_RATE_DROP_THRESHOLD
                 else 'warning'
