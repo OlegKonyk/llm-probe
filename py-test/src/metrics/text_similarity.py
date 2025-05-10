@@ -372,6 +372,11 @@ def validate_length(
         >>> validate_length("Issue", 5, 10)
         {'passed': False, 'word_count': 1}
     """
+    if min_words < 0 or max_words < 0:
+        raise ValueError("Word count limits must be non-negative")
+    if min_words > max_words:
+        raise ValueError(f"min_words ({min_words}) cannot be greater than max_words ({max_words})")
+
     words = _tokenize(text)
     word_count = len(words)
 

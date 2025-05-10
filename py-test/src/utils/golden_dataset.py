@@ -127,6 +127,9 @@ class GoldenDatasetLoader:
         else:
             self.dataset_path = Path(dataset_path)
 
+        # Cache for index to avoid repeated loading
+        self._index: Optional[GoldenDatasetIndex] = None
+
     def load_index(self) -> GoldenDatasetIndex:
         """
         Load Dataset Index
@@ -147,10 +150,12 @@ class GoldenDatasetLoader:
             >>> print(f"Total cases: {index.total_cases}")
             >>> print(f"Categories: {index.categories}")
         """
-        index_path = self.dataset_path / 'index.json'
-        with open(index_path, encoding='utf-8') as f:
-            data = json.load(f)
-        return GoldenDatasetIndex.from_dict(data)
+        if self._index is None:
+            index_path = self.dataset_path / 'index.json'
+            with open(index_path, encoding='utf-8') as f:
+                data = json.load(f)
+            self._index = GoldenDatasetIndex.from_dict(data)
+        return self._index
 
     def load_test_case(self, case_id: str) -> GoldenTestCase:
         """
