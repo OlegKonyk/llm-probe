@@ -109,26 +109,23 @@ class GoldenDatasetLoader:
         Creates a new GoldenDatasetLoader
 
         Automatically locates the golden-dataset directory relative to
-        the project root if no path is provided.
+        this source file location if no path is provided.
+
+        Directory structure:
+        - py-test/src/utils/golden_dataset.py (this file)
+        - golden-dataset/ (target directory, 4 levels up)
 
         Args:
             dataset_path: Optional explicit path to golden-dataset directory.
-                         If None, auto-detects relative to project root.
+                         If None, auto-detects relative to this file.
         """
         if dataset_path is None:
-            # Find project root by looking for pyproject.toml
+            # Navigate from py-test/src/utils to golden-dataset
+            # Path: ./src/utils -> ./src -> ./py-test -> .. -> ../golden-dataset
             current_file = Path(__file__).resolve()
-            project_root = current_file.parent
-            while project_root != project_root.parent:
-                if (project_root / 'pyproject.toml').exists():
-                    break
-                project_root = project_root.parent
-            self.dataset_path = project_root.parent / 'golden-dataset'
+            self.dataset_path = current_file.parent.parent.parent.parent / 'golden-dataset'
         else:
             self.dataset_path = Path(dataset_path)
-
-        # Cache for index to avoid repeated loading
-        self._index: Optional[GoldenDatasetIndex] = None
 
     def load_index(self) -> GoldenDatasetIndex:
         """
@@ -150,12 +147,10 @@ class GoldenDatasetLoader:
             >>> print(f"Total cases: {index.total_cases}")
             >>> print(f"Categories: {index.categories}")
         """
-        if self._index is None:
-            index_path = self.dataset_path / 'index.json'
-            with open(index_path, encoding='utf-8') as f:
-                data = json.load(f)
-            self._index = GoldenDatasetIndex.from_dict(data)
-        return self._index
+        index_path = self.dataset_path / 'index.json'
+        with open(index_path, encoding='utf-8') as f:
+            data = json.load(f)
+        return GoldenDatasetIndex.from_dict(data)
 
     def load_test_case(self, case_id: str) -> GoldenTestCase:
         """

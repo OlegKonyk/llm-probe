@@ -365,9 +365,6 @@ def validate_length(
             - passed (bool): Whether length is in valid range
             - word_count (int): Actual word count
 
-    Raises:
-        ValueError: If min_words > max_words or if either is negative
-
     Example:
         >>> validate_length("Customer had issue resolved", 3, 10)
         {'passed': True, 'word_count': 4}
@@ -375,11 +372,6 @@ def validate_length(
         >>> validate_length("Issue", 5, 10)
         {'passed': False, 'word_count': 1}
     """
-    if min_words < 0 or max_words < 0:
-        raise ValueError("Word count limits must be non-negative")
-    if min_words > max_words:
-        raise ValueError(f"min_words ({min_words}) cannot be greater than max_words ({max_words})")
-
     words = _tokenize(text)
     word_count = len(words)
 

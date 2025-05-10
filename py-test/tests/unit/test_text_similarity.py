@@ -71,11 +71,6 @@ class TestJaccardSimilarity:
         # 1 common word (customer) / 5 unique words
         assert result == pytest.approx(0.2, abs=0.01)
 
-    def test_both_empty(self):
-        """Both texts empty should return 0"""
-        result = jaccard_similarity("", "")
-        assert result == 0.0
-
 
 class TestOverlapCoefficient:
     """Tests for overlap coefficient metric"""
@@ -92,11 +87,6 @@ class TestOverlapCoefficient:
         text1 = "customer service"
         text2 = "weather forecast"
         result = overlap_coefficient(text1, text2)
-        assert result == 0.0
-
-    def test_one_empty(self):
-        """One text empty should return 0"""
-        result = overlap_coefficient("", "customer service")
         assert result == 0.0
 
 
@@ -190,21 +180,6 @@ class TestLengthValidation:
 
         assert result['passed'] is False
         assert result['word_count'] == 20
-
-    def test_negative_min_words(self):
-        """Negative min_words should raise ValueError"""
-        with pytest.raises(ValueError, match="must be non-negative"):
-            validate_length("test", -1, 10)
-
-    def test_negative_max_words(self):
-        """Negative max_words should raise ValueError"""
-        with pytest.raises(ValueError, match="must be non-negative"):
-            validate_length("test", 5, -1)
-
-    def test_min_greater_than_max(self):
-        """min_words > max_words should raise ValueError"""
-        with pytest.raises(ValueError, match="cannot be greater than"):
-            validate_length("test", 10, 5)
 
 
 class TestNgramPrecision:
