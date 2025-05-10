@@ -273,17 +273,20 @@ class SummaryEvaluator:
 
         # All metrics with thresholds where applicable
         report += "Metrics:\n"
-        min_sim = test_case.thresholds['min_semantic_similarity']
-        report += f"  Similarity: {result.similarity:.3f} (threshold: {min_sim})\n"
+        report += (
+            f"  Similarity: {result.similarity:.3f} "
+            f"(threshold: {test_case.thresholds['min_semantic_similarity']})\n"
+        )
         report += f"  BLEU Score: {result.bleu:.3f}\n"
-        min_len = test_case.thresholds['min_length_words']
-        max_len = test_case.thresholds['max_length_words']
         report += (
             f"  Word Count: {result.length_check['word_count']} "
-            f"(range: [{min_len}, {max_len}])\n"
+            f"(range: [{test_case.thresholds['min_length_words']}, "
+            f"{test_case.thresholds['max_length_words']}])\n"
         )
-        coverage = result.required_terms['coverage'] * 100
-        report += f"  Required Terms Coverage: {coverage:.0f}%\n"
+        report += (
+            f"  Required Terms Coverage: "
+            f"{result.required_terms['coverage'] * 100:.0f}%\n"
+        )
 
         # Detailed failure explanations (if any)
         if len(result.failures) > 0:

@@ -244,10 +244,10 @@ overlap_coefficient(text1: str, text2: str) -> float
 composite_similarity(text1: str, text2: str) -> float
 
 # Required terms validation
-contains_required_terms(text: str, required_terms: list[str]) -> dict
+contains_required_terms(text: str, required_terms: List[str]) -> Dict
 
 # Length validation
-validate_length(text: str, min_words: int, max_words: int) -> dict
+validate_length(text: str, min_words: int, max_words: int) -> Dict
 
 # N-gram precision
 ngram_precision(reference: str, candidate: str, n: int = 1) -> float
@@ -268,8 +268,8 @@ class SummaryEvaluator:
 
     def evaluate_consistency(
         self,
-        summaries: list[str]
-    ) -> dict[str, float]
+        summaries: List[str]
+    ) -> Dict[str, float]
 
     def generate_report(
         self,
@@ -284,9 +284,9 @@ class SummaryEvaluator:
 class GoldenDatasetLoader:
     def load_index(self) -> GoldenDatasetIndex
     def load_test_case(self, case_id: str) -> GoldenTestCase
-    def load_all_test_cases(self) -> list[GoldenTestCase]
-    def load_by_category(self, category: str) -> list[GoldenTestCase]
-    def load_by_difficulty(self, difficulty: str) -> list[GoldenTestCase]
+    def load_all_test_cases(self) -> List[GoldenTestCase]
+    def load_by_category(self, category: str) -> List[GoldenTestCase]
+    def load_by_difficulty(self, difficulty: str) -> List[GoldenTestCase]
 ```
 
 ## 🧪 Testing
