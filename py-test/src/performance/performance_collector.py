@@ -340,9 +340,9 @@ class PerformanceCollector:
 
         # Clamp duration to minimum epsilon to prevent division by zero
         # For single fast requests, duration could be 0ms, leading to Infinity throughput
-        MIN_DURATION_SECONDS = 0.001  # 1ms minimum
+        min_duration_seconds = 0.001  # 1ms minimum
         duration_raw = (max_time - min_time) / 1000  # in seconds
-        duration = max(duration_raw, MIN_DURATION_SECONDS)
+        duration = max(duration_raw, min_duration_seconds)
 
         # Calculate totals
         total_input_tokens = sum(input_tokens)

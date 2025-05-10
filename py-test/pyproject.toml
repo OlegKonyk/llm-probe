@@ -63,4 +63,20 @@ disallow_untyped_defs = true
 [tool.ruff]
 line-length = 100
 target-version = "py39"
-select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "W",   # pycodestyle warnings
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear (additional bug detection)
+    "C4",  # flake8-comprehensions (list/dict comprehensions)
+    "SIM", # flake8-simplify (code simplification)
+]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]  # Allow assert in tests

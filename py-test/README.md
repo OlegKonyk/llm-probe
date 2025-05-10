@@ -2,6 +2,8 @@
 
 A Python implementation of the comprehensive, production-ready testing framework for Large Language Model (LLM) applications. This provides feature parity with the TypeScript version while offering Python-native interfaces and idioms.
 
+**Industry Standards Compliance:** This framework follows best practices from [Google](https://google.github.io/styleguide/pyguide.html), [Netflix](https://netflixtechblog.com/), and [IEEE ML testing standards](https://standards.ieee.org/). See [STANDARDS.md](./STANDARDS.md) for detailed compliance documentation.
+
 ## 🎯 Project Overview
 
 This Python framework provides robust quality assurance for LLM-powered systems with real-world validation capabilities. It includes comprehensive evaluation metrics, security detection, performance tracking, and monitoring tools.
