@@ -1,18 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import { EnvApiKeyProvider } from '../auth/env-api-key-provider.js';
+import { ApiKeyFactory } from '../auth/api-key-factory.js';
 import { logger } from '../utils/logger.js';
 
-let providerPromise: Promise<EnvApiKeyProvider> | null = null;
-
-function getProvider(): Promise<EnvApiKeyProvider> {
-  if (!providerPromise) {
-    providerPromise = (async () => {
-      const provider = new EnvApiKeyProvider();
-      await provider.initialize();
-      return provider;
-    })();
-  }
-  return providerPromise;
+async function getProvider() {
+  return await ApiKeyFactory.getProvider();
 }
 
 export interface AuthenticatedRequest extends Request {
