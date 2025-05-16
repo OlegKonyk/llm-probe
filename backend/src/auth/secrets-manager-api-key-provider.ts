@@ -42,12 +42,11 @@ export class SecretsManagerApiKeyProvider implements ApiKeyProvider {
       );
     }
 
-    if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-      throw new Error(
-        'AWS credentials not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.'
-      );
-    }
-
+    // AWS SDK will automatically use credentials from:
+    // 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+    // 2. AWS SSO (configured via aws configure sso)
+    // 3. IAM roles (in production on ECS/EC2)
+    // 4. Instance metadata service
     this.client = new SecretsManagerClient({
       region: awsRegion,
     });

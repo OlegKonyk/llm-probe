@@ -153,6 +153,10 @@ This document provides a comprehensive overview of the technologies, frameworks,
   - `.env` files for local development
   - Docker Compose environment variables
   - AWS Secrets Manager for production
+- **AWS Authentication** - Multiple credential sources
+  - AWS SSO (local development)
+  - IAM roles (production)
+  - Environment variables (testing)
 - **Zod Schemas** - Type-safe config validation
 
 ### Test Data

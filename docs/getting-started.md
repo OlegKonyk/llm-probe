@@ -140,18 +140,60 @@ The backend uses environment variables for configuration. Default values are pro
 
 **Backend Configuration** (`backend/.env`):
 ```bash
+# Server Configuration
 PORT=3000
-NODE_ENV=production
-OLLAMA_HOST=http://localhost:11434
+NODE_ENV=development
+
+# LLM Provider (ollama or bedrock)
 LLM_PROVIDER=ollama
-LLM_MODEL=llama3.2:latest
-LLM_TIMEOUT_MS=90000
-API_KEY_AUTH_ENABLED=false
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=llama3.2:latest
+OLLAMA_TIMEOUT_MS=90000
+
+# API Key Authentication
+API_KEY_PROVIDER=env
+API_KEY=your-api-key-here
+
+# Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 ```
 
 When running with Docker Compose, use `OLLAMA_HOST=http://ollama:11434` instead.
+
+### AWS Configuration (Optional)
+
+For AWS services (Bedrock, Secrets Manager), configure credentials using one of these methods:
+
+**Option 1: AWS SSO (Recommended for local development)**
+```bash
+# Configure SSO
+aws configure sso --profile <profile-name>
+
+# Login
+aws sso login --profile <profile-name>
+
+# Set profile in .env
+AWS_PROFILE=<profile-name>
+AWS_REGION=us-east-2
+```
+
+**Option 2: Environment Variables**
+```bash
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_REGION=us-east-2
+```
+
+**Option 3: IAM Roles (Production)**
+- No configuration needed - uses ECS task role or EC2 instance profile
+
+**Using AWS Secrets Manager for API Keys:**
+```bash
+API_KEY_PROVIDER=secrets-manager
+API_KEYS_SECRET_NAME=your-secret-name
+AWS_REGION=us-east-2
+```
 
 ## Development Workflow
 
