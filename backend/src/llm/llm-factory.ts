@@ -29,8 +29,8 @@ export class LLMFactory {
       case 'bedrock':
         logger.info('Initializing Bedrock LLM provider', {
           provider: 'bedrock',
-          region: process.env.AWS_REGION || 'us-east-1',
-          model: process.env.BEDROCK_MODEL || 'anthropic.claude-3-haiku-20240307-v1:0',
+          region: process.env.AWS_REGION || 'us-east-2',
+          model: process.env.BEDROCK_MODEL || 'us.amazon.nova-lite-v1:0',
         });
         this.instance = new BedrockProvider();
         break;

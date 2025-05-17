@@ -1,6 +1,7 @@
 import { Ollama } from 'ollama';
 import type { LLMProvider, LLMOptions, LLMResponse } from './llm-provider.interface.js';
 import { OllamaConnectionError, ModelNotFoundError, LLMGenerationError, LLMTimeoutError } from '../errors/llm-errors.js';
+import { withTimeout } from '../utils/timeout.js';
 
 export class OllamaProvider implements LLMProvider {
   private client: Ollama;
@@ -21,7 +22,7 @@ export class OllamaProvider implements LLMProvider {
     // not individual requests. For non-streaming requests, there's no per-request abort control.
     // The timeout will reject the promise but the underlying Ollama request continues until completion.
     try {
-      const response = await this.withTimeout(
+      const response = await withTimeout(
         this.client.generate({
           model: this.model,
           prompt,
@@ -86,19 +87,5 @@ export class OllamaProvider implements LLMProvider {
 
   getModel(): string {
     return this.model;
-  }
-
-  private withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-    let timeoutHandle: NodeJS.Timeout;
-    const timeoutPromise = new Promise<T>((_, reject) => {
-      timeoutHandle = setTimeout(
-        () => reject(new LLMTimeoutError(`Request timed out after ${timeoutMs}ms`, timeoutMs)),
-        timeoutMs
-      );
-    });
-
-    return Promise.race([promise, timeoutPromise]).finally(() => {
-      clearTimeout(timeoutHandle);
-    });
   }
 }
