@@ -1,3 +1,9 @@
+/**
+ * Metrics Aggregator Tests
+ *
+ * Tests the monitoring and observability system that tracks test results
+ * over time, detects regressions, and generates alerts.
+ */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { MetricsAggregator, TestRunResult } from '../../src/monitoring/metrics-aggregator.js';
@@ -14,6 +20,7 @@ describe('Metrics Aggregator Tests', () => {
   });
 
   afterEach(() => {
+    // Cleanup test data
     if (fs.existsSync(testDataDir)) {
       fs.rmSync(testDataDir, { recursive: true });
     }
@@ -73,12 +80,13 @@ describe('Metrics Aggregator Tests', () => {
       }
 
       const recent = aggregator.getRecentRuns(150);
-      expect(recent).toHaveLength(100);
+      expect(recent).toHaveLength(100); // Capped at 100
     });
   });
 
   describe('Baseline Calculation', () => {
     it('should calculate baseline from recent runs', () => {
+      // Add 10 test runs with consistent metrics
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -102,6 +110,7 @@ describe('Metrics Aggregator Tests', () => {
     });
 
     it('should return null when insufficient data', () => {
+      // Only 2 runs (need at least 3)
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -127,6 +136,7 @@ describe('Metrics Aggregator Tests', () => {
     });
 
     it('should detect improving trend', () => {
+      // First 5 runs with lower similarity
       for (let i = 0; i < 5; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -140,6 +150,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Next 5 runs with higher similarity
       for (let i = 0; i < 5; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -158,6 +169,7 @@ describe('Metrics Aggregator Tests', () => {
     });
 
     it('should detect degrading trend', () => {
+      // First 5 runs with higher similarity
       for (let i = 0; i < 5; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -171,6 +183,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Next 5 runs with lower similarity
       for (let i = 0; i < 5; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -191,6 +204,7 @@ describe('Metrics Aggregator Tests', () => {
 
   describe('Regression Detection', () => {
     it('should detect similarity regression', () => {
+      // Establish baseline with good similarity
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -204,6 +218,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Add a run with significantly lower similarity
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -212,7 +227,7 @@ describe('Metrics Aggregator Tests', () => {
         failed: 0,
         skipped: 0,
         duration: 1000,
-        avgSimilarity: 0.35,
+        avgSimilarity: 0.35, // Large drop to trigger critical alert
       });
 
       const alerts = aggregator.checkForRegressions();
@@ -220,10 +235,11 @@ describe('Metrics Aggregator Tests', () => {
       expect(alerts.length).toBeGreaterThan(0);
       const simAlert = alerts.find((a) => a.metric === 'similarity');
       expect(simAlert).toBeDefined();
-      expect(simAlert!.severity).toBe('critical');
+      expect(simAlert!.severity).toBe('critical'); // >20% drop
     });
 
     it('should detect latency regression', () => {
+      // Establish baseline
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -237,6 +253,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Add a run with significantly higher latency
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -245,7 +262,7 @@ describe('Metrics Aggregator Tests', () => {
         failed: 0,
         skipped: 0,
         duration: 1000,
-        avgLatency: 3500,
+        avgLatency: 3500, // Large increase to trigger critical alert
       });
 
       const alerts = aggregator.checkForRegressions();
@@ -253,10 +270,11 @@ describe('Metrics Aggregator Tests', () => {
       expect(alerts.length).toBeGreaterThan(0);
       const latencyAlert = alerts.find((a) => a.metric === 'latency');
       expect(latencyAlert).toBeDefined();
-      expect(latencyAlert!.severity).toBe('critical');
+      expect(latencyAlert!.severity).toBe('critical'); // >50% increase
     });
 
     it('should detect pass rate regression', () => {
+      // Establish baseline with 100% pass rate
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -269,6 +287,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Add a run with lower pass rate
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -284,10 +303,11 @@ describe('Metrics Aggregator Tests', () => {
       expect(alerts.length).toBeGreaterThan(0);
       const passRateAlert = alerts.find((a) => a.metric === 'pass_rate');
       expect(passRateAlert).toBeDefined();
-      expect(passRateAlert!.current).toBe(0.8);
+      expect(passRateAlert!.current).toBe(0.8); // 80%
     });
 
     it('should not alert on minor fluctuations', () => {
+      // Establish baseline
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -302,6 +322,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Add a run with small changes (within threshold)
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -310,17 +331,18 @@ describe('Metrics Aggregator Tests', () => {
         failed: 0,
         skipped: 0,
         duration: 1000,
-        avgSimilarity: 0.48,
-        avgLatency: 2200,
+        avgSimilarity: 0.48, // 4% drop (threshold is 10%)
+        avgLatency: 2200, // 10% increase (threshold is 25%)
       });
 
       const alerts = aggregator.checkForRegressions();
-      expect(alerts).toHaveLength(0);
+      expect(alerts).toHaveLength(0); // No alerts for minor changes
     });
   });
 
   describe('Dashboard Generation', () => {
     it('should generate dashboard with current metrics', () => {
+      // Add test runs
       for (let i = 0; i < 5; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -345,6 +367,7 @@ describe('Metrics Aggregator Tests', () => {
     });
 
     it('should show alerts in dashboard', () => {
+      // Baseline
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -358,6 +381,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Regression
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -366,7 +390,7 @@ describe('Metrics Aggregator Tests', () => {
         failed: 0,
         skipped: 0,
         duration: 1000,
-        avgSimilarity: 0.35,
+        avgSimilarity: 0.35, // Large drop to trigger critical alert
       });
 
       const dashboard = aggregator.generateDashboard();
@@ -404,6 +428,7 @@ describe('Metrics Aggregator Tests', () => {
     it('should get runs for a specific time period', () => {
       const now = new Date();
 
+      // Add runs from different time periods
       for (let i = 0; i < 5; i++) {
         const timestamp = new Date(now);
         timestamp.setDate(timestamp.getDate() - i);
@@ -421,17 +446,19 @@ describe('Metrics Aggregator Tests', () => {
 
       const last3Days = aggregator.getRunsForPeriod(3);
       expect(last3Days.length).toBeGreaterThan(0);
-      expect(last3Days.length).toBeLessThanOrEqual(4);
+      expect(last3Days.length).toBeLessThanOrEqual(4); // 0, 1, 2, 3 days ago
     });
   });
 
   describe('Custom Thresholds', () => {
     it('should allow custom alert thresholds', () => {
+      // Set very strict thresholds
       aggregator.setThresholds({
-        similarityDrop: 0.05,
-        latencyIncrease: 0.1,
+        similarityDrop: 0.05, // 5% drop triggers alert
+        latencyIncrease: 0.1, // 10% increase triggers alert
       });
 
+      // Baseline
       for (let i = 0; i < 10; i++) {
         aggregator.recordTestRun({
           timestamp: new Date(),
@@ -446,6 +473,7 @@ describe('Metrics Aggregator Tests', () => {
         });
       }
 
+      // Small change that triggers with strict threshold
       aggregator.recordTestRun({
         timestamp: new Date(),
         testSuite: 'test',
@@ -454,7 +482,7 @@ describe('Metrics Aggregator Tests', () => {
         failed: 0,
         skipped: 0,
         duration: 1000,
-        avgSimilarity: 0.47,
+        avgSimilarity: 0.47, // 6% drop (triggers 5% threshold)
       });
 
       const alerts = aggregator.checkForRegressions();

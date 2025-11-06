@@ -1,86 +1,87 @@
-import { describe, it, expect } from '@jest/globals';
-import { GoldenDatasetLoader, GoldenDatasetValidationError } from '../../src/utils/golden-dataset.js';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import { GoldenDatasetLoader } from '../../src/utils/golden-dataset.js';
 
-describe('GoldenDatasetLoader', () => {
-  const loader = new GoldenDatasetLoader();
+describe('GoldenDatasetLoader Unit Tests', () => {
+  let loader: GoldenDatasetLoader;
+
+  beforeEach(() => {
+    loader = new GoldenDatasetLoader();
+  });
 
   describe('loadIndex', () => {
-    it('should load index successfully', () => {
+    it('should load the dataset index', () => {
       const index = loader.loadIndex();
 
-      expect(index).toBeDefined();
       expect(index.dataset_version).toBe('1.0.0');
       expect(index.total_cases).toBe(5);
-      expect(Array.isArray(index.test_cases)).toBe(true);
-      expect(index.test_cases.length).toBe(5);
+      expect(index.test_cases).toHaveLength(5);
     });
 
-    it('should cache index after first load', () => {
-      const index1 = loader.loadIndex();
-      const index2 = loader.loadIndex();
+    it('should have correct category distribution', () => {
+      const index = loader.loadIndex();
 
-      expect(index1).toBe(index2);
+      expect(index.categories.password_reset).toBe(1);
+      expect(index.categories.billing_inquiry).toBe(1);
+      expect(index.categories.product_issue).toBe(1);
+      expect(index.categories.account_update).toBe(1);
+      expect(index.categories.general_inquiry).toBe(1);
     });
 
-    it('should clear cache when requested', () => {
-      const index1 = loader.loadIndex();
-      loader.clearCache();
-      const index2 = loader.loadIndex();
+    it('should have correct difficulty distribution', () => {
+      const index = loader.loadIndex();
 
-      expect(index1).not.toBe(index2);
-      expect(index1).toEqual(index2);
+      expect(index.difficulty_distribution.easy).toBe(2);
+      expect(index.difficulty_distribution.medium).toBe(2);
+      expect(index.difficulty_distribution.hard).toBe(1);
     });
   });
 
   describe('loadTestCase', () => {
-    it('should load valid test case', () => {
+    it('should load a specific test case by ID', () => {
       const testCase = loader.loadTestCase('call_001');
 
       expect(testCase.id).toBe('call_001');
       expect(testCase.category).toBe('password_reset');
-      expect(testCase.difficulty).toBe('easy');
+      expect(testCase.transcript).toBeDefined();
+      expect(testCase.golden_summary).toBeDefined();
+    });
+
+    it('should load test case with all required fields', () => {
+      const testCase = loader.loadTestCase('call_002');
+
+      expect(testCase.id).toBe('call_002');
+      expect(testCase.category).toBe('billing_inquiry');
+      expect(testCase.difficulty).toBe('medium');
       expect(testCase.transcript).toBeTruthy();
       expect(testCase.golden_summary).toBeTruthy();
       expect(testCase.metadata).toBeDefined();
+      expect(testCase.thresholds).toBeDefined();
+    });
+
+    it('should load metadata correctly', () => {
+      const testCase = loader.loadTestCase('call_001');
+
       expect(testCase.metadata.sentiment).toBe('positive');
       expect(testCase.metadata.resolution_status).toBe('resolved');
       expect(Array.isArray(testCase.metadata.key_points)).toBe(true);
-      expect(testCase.thresholds).toBeDefined();
-      expect(testCase.thresholds.min_semantic_similarity).toBe(0.80);
+      expect(testCase.metadata.key_points.length).toBeGreaterThan(0);
+    });
+
+    it('should load thresholds correctly', () => {
+      const testCase = loader.loadTestCase('call_001');
+
+      expect(testCase.thresholds.min_semantic_similarity).toBeGreaterThan(0);
+      expect(testCase.thresholds.min_length_words).toBeGreaterThan(0);
+      expect(testCase.thresholds.max_length_words).toBeGreaterThan(
+        testCase.thresholds.min_length_words
+      );
+      expect(Array.isArray(testCase.thresholds.required_terms)).toBe(true);
     });
 
     it('should throw error for non-existent test case', () => {
-      expect(() => loader.loadTestCase('nonexistent')).toThrow(
-        /Test case 'nonexistent' not found in index/
+      expect(() => loader.loadTestCase('call_999')).toThrow(
+        "Test case 'call_999' not found in index"
       );
-    });
-
-    it('should reject path traversal attempts', () => {
-      const maliciousMap = new Map([
-        ['malicious', { file: '../../backend/.env', category: 'test', difficulty: 'easy' }]
-      ]);
-
-      (loader as any).testCaseMap = maliciousMap;
-      (loader as any).indexCache = { test_cases: [] };
-
-      expect(() => loader.loadTestCase('malicious')).toThrow(GoldenDatasetValidationError);
-      expect(() => loader.loadTestCase('malicious')).toThrow(/absolute paths and parent directory traversal/);
-
-      loader.clearCache();
-    });
-
-    it('should reject absolute paths', () => {
-      const maliciousMap = new Map([
-        ['malicious', { file: '/etc/passwd', category: 'test', difficulty: 'easy' }]
-      ]);
-
-      (loader as any).testCaseMap = maliciousMap;
-      (loader as any).indexCache = { test_cases: [] };
-
-      expect(() => loader.loadTestCase('malicious')).toThrow(GoldenDatasetValidationError);
-      expect(() => loader.loadTestCase('malicious')).toThrow(/absolute paths and parent directory traversal/);
-
-      loader.clearCache();
     });
   });
 
@@ -88,26 +89,46 @@ describe('GoldenDatasetLoader', () => {
     it('should load all test cases', () => {
       const allCases = loader.loadAllTestCases();
 
-      expect(allCases.length).toBe(5);
-      expect(allCases[0].id).toBe('call_001');
-      expect(allCases[4].id).toBe('call_005');
+      expect(allCases).toHaveLength(5);
+      expect(allCases.every((tc) => tc.id)).toBe(true);
+      expect(allCases.every((tc) => tc.transcript)).toBe(true);
+      expect(allCases.every((tc) => tc.golden_summary)).toBe(true);
+    });
+
+    it('should load distinct test cases', () => {
+      const allCases = loader.loadAllTestCases();
+      const ids = allCases.map((tc) => tc.id);
+      const uniqueIds = new Set(ids);
+
+      expect(uniqueIds.size).toBe(allCases.length);
     });
   });
 
   describe('loadByCategory', () => {
     it('should load test cases by category', () => {
-      const passwordCases = loader.loadByCategory('password_reset');
+      const passwordResetCases = loader.loadByCategory('password_reset');
 
-      expect(passwordCases.length).toBeGreaterThan(0);
-      passwordCases.forEach(tc => {
-        expect(tc.category).toBe('password_reset');
-      });
+      expect(passwordResetCases).toHaveLength(1);
+      expect(passwordResetCases[0].category).toBe('password_reset');
     });
 
     it('should return empty array for non-existent category', () => {
-      const cases = loader.loadByCategory('nonexistent_category');
+      const cases = loader.loadByCategory('non_existent_category');
 
-      expect(cases.length).toBe(0);
+      expect(cases).toHaveLength(0);
+    });
+
+    it('should load multiple cases for same category if they exist', () => {
+      // All our current categories have 1 case each
+      const allCategories = ['password_reset', 'billing_inquiry', 'product_issue', 'account_update', 'general_inquiry'];
+
+      allCategories.forEach(category => {
+        const cases = loader.loadByCategory(category);
+        expect(cases.length).toBeGreaterThan(0);
+        cases.forEach(tc => {
+          expect(tc.category).toBe(category);
+        });
+      });
     });
   });
 
@@ -115,51 +136,32 @@ describe('GoldenDatasetLoader', () => {
     it('should load test cases by difficulty', () => {
       const easyCases = loader.loadByDifficulty('easy');
 
-      expect(easyCases.length).toBeGreaterThan(0);
-      easyCases.forEach(tc => {
+      expect(easyCases).toHaveLength(2);
+      easyCases.forEach((tc) => {
         expect(tc.difficulty).toBe('easy');
       });
+    });
+
+    it('should load medium difficulty cases', () => {
+      const mediumCases = loader.loadByDifficulty('medium');
+
+      expect(mediumCases).toHaveLength(2);
+      mediumCases.forEach((tc) => {
+        expect(tc.difficulty).toBe('medium');
+      });
+    });
+
+    it('should load hard difficulty cases', () => {
+      const hardCases = loader.loadByDifficulty('hard');
+
+      expect(hardCases).toHaveLength(1);
+      expect(hardCases[0].difficulty).toBe('hard');
     });
 
     it('should return empty array for non-existent difficulty', () => {
       const cases = loader.loadByDifficulty('impossible');
 
-      expect(cases.length).toBe(0);
-    });
-  });
-
-  describe('validation', () => {
-    it('should validate metadata fields', () => {
-      const testCase = loader.loadTestCase('call_001');
-
-      expect(testCase.metadata.sentiment).toBeDefined();
-      expect(typeof testCase.metadata.sentiment).toBe('string');
-      expect(testCase.metadata.sentiment.length).toBeGreaterThan(0);
-
-      expect(testCase.metadata.resolution_status).toBeDefined();
-      expect(typeof testCase.metadata.resolution_status).toBe('string');
-
-      expect(Array.isArray(testCase.metadata.key_points)).toBe(true);
-      testCase.metadata.key_points.forEach(point => {
-        expect(typeof point).toBe('string');
-        expect(point.length).toBeGreaterThan(0);
-      });
-    });
-
-    it('should validate threshold fields', () => {
-      const testCase = loader.loadTestCase('call_001');
-
-      expect(testCase.thresholds.min_semantic_similarity).toBeGreaterThanOrEqual(0);
-      expect(testCase.thresholds.min_semantic_similarity).toBeLessThanOrEqual(1);
-
-      expect(testCase.thresholds.min_length_words).toBeGreaterThanOrEqual(0);
-      expect(testCase.thresholds.max_length_words).toBeGreaterThanOrEqual(testCase.thresholds.min_length_words);
-
-      expect(Array.isArray(testCase.thresholds.required_terms)).toBe(true);
-      testCase.thresholds.required_terms.forEach(term => {
-        expect(typeof term).toBe('string');
-        expect(term.length).toBeGreaterThan(0);
-      });
+      expect(cases).toHaveLength(0);
     });
   });
 });

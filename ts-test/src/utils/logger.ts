@@ -24,7 +24,6 @@ export interface LogContext {
 class Logger {
   private minLevel: LogLevel;
   private isProduction: boolean;
-  private readonly context: LogContext;
 
   private levels: Record<LogLevel, number> = {
     debug: 0,
@@ -33,10 +32,9 @@ class Logger {
     error: 3,
   };
 
-  constructor(context: LogContext = {}) {
+  constructor() {
     this.minLevel = (process.env.LOG_LEVEL as LogLevel) || 'info';
     this.isProduction = process.env.NODE_ENV === 'production';
-    this.context = context;
   }
 
   /**
@@ -55,7 +53,6 @@ class Logger {
     context?: LogContext
   ): string {
     const timestamp = new Date().toISOString();
-    const logContext = { ...this.context, ...context };
 
     if (this.isProduction) {
       // JSON format for production (easy to parse by log tools)
@@ -63,7 +60,7 @@ class Logger {
         timestamp,
         level,
         message,
-        ...logContext,
+        ...context,
       });
     } else {
       // Human-readable format for development
@@ -76,8 +73,8 @@ class Logger {
 
       let formatted = `${levelEmoji[level]} [${level.toUpperCase()}] ${message}`;
 
-      if (logContext && Object.keys(logContext).length > 0) {
-        formatted += `\n  Context: ${JSON.stringify(logContext, null, 2)}`;
+      if (context && Object.keys(context).length > 0) {
+        formatted += `\n  Context: ${JSON.stringify(context, null, 2)}`;
       }
 
       return formatted;
@@ -135,7 +132,23 @@ class Logger {
    * Create child logger with additional context
    */
   child(context: LogContext): Logger {
-    return new Logger({ ...this.context, ...context });
+    const child = new Logger();
+    // Override logging methods to include parent context
+    const originalDebug = child.debug.bind(child);
+    const originalInfo = child.info.bind(child);
+    const originalWarn = child.warn.bind(child);
+    const originalError = child.error.bind(child);
+
+    child.debug = (msg: string, ctx?: LogContext) =>
+      originalDebug(msg, { ...context, ...ctx });
+    child.info = (msg: string, ctx?: LogContext) =>
+      originalInfo(msg, { ...context, ...ctx });
+    child.warn = (msg: string, ctx?: LogContext) =>
+      originalWarn(msg, { ...context, ...ctx });
+    child.error = (msg: string, err?: Error | unknown, ctx?: LogContext) =>
+      originalError(msg, err, { ...context, ...ctx });
+
+    return child;
   }
 }
 

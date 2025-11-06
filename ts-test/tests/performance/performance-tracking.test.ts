@@ -1,3 +1,31 @@
+/**
+ * Performance Tracking Tests
+ *
+ * Tests the performance metrics collection and analysis system.
+ * These tests validate that we can accurately track:
+ * - Latency measurements
+ * - Token usage and cost calculation
+ * - Throughput metrics
+ * - Statistical analysis (percentiles, mean, std dev)
+ * - SLO (Service Level Objective) compliance
+ *
+ * Why Performance Testing for LLMs?
+ * - LLMs have variable response times (depends on output length)
+ * - Token-based pricing requires cost tracking
+ * - Production systems need SLO monitoring
+ * - Performance regression detection is critical
+ *
+ * Test Coverage:
+ * - Basic metric recording (5 tests)
+ * - Latency tracking and statistics (4 tests)
+ * - Token usage and cost calculation (4 tests)
+ * - Report generation (3 tests)
+ * - SLO compliance checking (4 tests)
+ * - Edge cases (4 tests)
+ * - Filtering and queries (3 tests)
+ *
+ * Total: 27 tests
+ */
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import {
@@ -15,9 +43,18 @@ describe('Performance Tracking Tests', () => {
   });
 
   describe('Basic Metric Recording', () => {
+    /**
+     * Test: Start and End Request
+     *
+     * Validates basic request tracking lifecycle:
+     * 1. Start request (records start time)
+     * 2. Simulate work (delay)
+     * 3. End request (calculates latency)
+     */
     it('should track request start and end times', async () => {
       const request = collector.startRequest();
 
+      // Simulate work
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       request.end({
@@ -29,7 +66,7 @@ describe('Performance Tracking Tests', () => {
       const metrics = collector.getMetrics();
       expect(metrics).toHaveLength(1);
       expect(metrics[0].latency).toBeGreaterThanOrEqual(100);
-      expect(metrics[0].latency).toBeLessThan(200);
+      expect(metrics[0].latency).toBeLessThan(200); // Allow some variance
       expect(metrics[0].success).toBe(true);
     });
 
@@ -45,7 +82,7 @@ describe('Performance Tracking Tests', () => {
       const metrics = collector.getMetrics();
       const ids = metrics.map((m) => m.requestId);
 
-      expect(new Set(ids).size).toBe(3);
+      expect(new Set(ids).size).toBe(3); // All unique
       expect(ids[0]).not.toBe(ids[1]);
       expect(ids[1]).not.toBe(ids[2]);
     });
@@ -97,6 +134,7 @@ describe('Performance Tracking Tests', () => {
 
   describe('Latency Tracking and Statistics', () => {
     it('should calculate mean latency correctly', () => {
+      // Record requests with known latencies
       const latencies = [100, 200, 300, 400, 500];
 
       latencies.forEach((latency) => {
@@ -110,10 +148,11 @@ describe('Performance Tracking Tests', () => {
       });
 
       const report = collector.generateReport();
-      expect(report.meanLatency).toBe(300);
+      expect(report.meanLatency).toBe(300); // (100+200+300+400+500)/5
     });
 
     it('should calculate percentiles correctly', () => {
+      // 100 requests with latencies from 100ms to 1000ms
       for (let i = 1; i <= 100; i++) {
         const latency = i * 10;
         collector.recordMetric({
@@ -127,12 +166,15 @@ describe('Performance Tracking Tests', () => {
 
       const report = collector.generateReport();
 
+      // P50 (median) should be around 500ms
       expect(report.medianLatency).toBeGreaterThanOrEqual(500);
       expect(report.medianLatency).toBeLessThanOrEqual(510);
 
+      // P95 should be around 950ms
       expect(report.p95Latency).toBeGreaterThanOrEqual(950);
       expect(report.p95Latency).toBeLessThanOrEqual(960);
 
+      // P99 should be around 990ms
       expect(report.p99Latency).toBeGreaterThanOrEqual(990);
       expect(report.p99Latency).toBeLessThanOrEqual(1000);
     });
@@ -156,6 +198,7 @@ describe('Performance Tracking Tests', () => {
     });
 
     it('should calculate standard deviation', () => {
+      // All same latency should have 0 std dev
       for (let i = 0; i < 10; i++) {
         collector.recordMetric({
           requestId: `req_${i}`,
@@ -195,20 +238,22 @@ describe('Performance Tracking Tests', () => {
       });
 
       const metrics = collector.getMetrics();
-      expect(metrics[0].cost).toBe(0);
+      expect(metrics[0].cost).toBe(0); // Local models are free
     });
 
     it('should calculate cost for commercial models', () => {
+      // Simulate GPT-4 usage (for testing cost calculation logic)
       const request = collector.startRequest();
       request.end({
-        inputTokens: 1_000_000,
-        outputTokens: 500_000,
+        inputTokens: 1_000_000,  // 1M input tokens
+        outputTokens: 500_000,   // 500k output tokens
         model: 'gpt-4',
       });
 
       const metrics = collector.getMetrics();
       const pricing = MODEL_PRICING['gpt-4'];
 
+      // Expected: (1M * $30/1M) + (500k * $60/1M) = $30 + $30 = $60
       const expectedCost = (1_000_000 / 1_000_000) * pricing.input +
                           (500_000 / 1_000_000) * pricing.output;
 
@@ -236,6 +281,7 @@ describe('Performance Tracking Tests', () => {
 
   describe('Report Generation', () => {
     it('should generate comprehensive performance report', () => {
+      // Add multiple requests with varying metrics
       for (let i = 1; i <= 10; i++) {
         collector.recordMetric({
           requestId: `req_${i}`,
@@ -258,10 +304,10 @@ describe('Performance Tracking Tests', () => {
       expect(report.failedRequests).toBe(0);
       expect(report.errorRate).toBe(0);
 
-      expect(report.meanLatency).toBe(550);
-      expect(report.totalInputTokens).toBe(2750);
-      expect(report.totalOutputTokens).toBe(1375);
-      expect(report.totalCost).toBe(0);
+      expect(report.meanLatency).toBe(550); // (100+200+...+1000)/10
+      expect(report.totalInputTokens).toBe(2750); // 50+100+...+500
+      expect(report.totalOutputTokens).toBe(1375); // 25+50+...+250
+      expect(report.totalCost).toBe(0); // Local model
     });
 
     it('should generate formatted text report', () => {
@@ -284,12 +330,13 @@ describe('Performance Tracking Tests', () => {
     });
 
     it('should calculate throughput metrics', () => {
+      // Simulate 10 requests over 5 seconds
       const startTime = Date.now() - 5000;
 
       for (let i = 0; i < 10; i++) {
         collector.recordMetric({
           requestId: `req_${i}`,
-          startTime: startTime + (i * 500),
+          startTime: startTime + (i * 500), // 500ms apart
           endTime: startTime + (i * 500) + 100,
           latency: 100,
           inputTokens: 50,
@@ -303,9 +350,11 @@ describe('Performance Tracking Tests', () => {
 
       const report = collector.generateReport();
 
+      // 10 requests over ~4.5 seconds = ~2.2 req/s
       expect(report.requestsPerSecond).toBeGreaterThan(2.0);
       expect(report.requestsPerSecond).toBeLessThan(2.5);
 
+      // 750 total tokens over ~4.5 seconds = ~166 tokens/s
       expect(report.tokensPerSecond).toBeGreaterThan(150);
       expect(report.tokensPerSecond).toBeLessThan(200);
     });
@@ -313,12 +362,13 @@ describe('Performance Tracking Tests', () => {
 
   describe('SLO Compliance Checking', () => {
     it('should pass SLO when metrics meet thresholds', () => {
+      // Add requests that meet SLO
       for (let i = 0; i < 100; i++) {
         collector.recordMetric({
           requestId: `req_${i}`,
           startTime: Date.now() - 100,
           endTime: Date.now(),
-          latency: 100 + Math.random() * 100,
+          latency: 100 + Math.random() * 100, // 100-200ms
           inputTokens: 50,
           outputTokens: 25,
           model: 'llama3.1:8b',
@@ -339,12 +389,13 @@ describe('Performance Tracking Tests', () => {
     });
 
     it('should fail SLO when P95 latency exceeds threshold', () => {
+      // Add requests with high latencies
       for (let i = 0; i < 100; i++) {
         collector.recordMetric({
           requestId: `req_${i}`,
           startTime: Date.now() - 3000,
           endTime: Date.now(),
-          latency: 3000,
+          latency: 3000, // High latency
           success: true,
         });
       }
@@ -363,6 +414,7 @@ describe('Performance Tracking Tests', () => {
     });
 
     it('should fail SLO when error rate exceeds threshold', () => {
+      // Add 95 successful and 5 failed requests (5% error rate)
       for (let i = 0; i < 95; i++) {
         collector.recordMetric({
           requestId: `success_${i}`,
@@ -387,7 +439,7 @@ describe('Performance Tracking Tests', () => {
       const slo: PerformanceSLO = {
         maxP95Latency: 1000,
         maxP99Latency: 2000,
-        maxErrorRate: 0.01,
+        maxErrorRate: 0.01, // 1% max error rate
       };
 
       const result = collector.checkSLO(slo);
@@ -396,6 +448,7 @@ describe('Performance Tracking Tests', () => {
     });
 
     it('should check throughput SLO if specified', () => {
+      // Add 5 requests over 10 seconds (0.5 req/s)
       const startTime = Date.now() - 10000;
 
       for (let i = 0; i < 5; i++) {
@@ -412,7 +465,7 @@ describe('Performance Tracking Tests', () => {
         maxP95Latency: 1000,
         maxP99Latency: 2000,
         maxErrorRate: 0.05,
-        minThroughput: 1.0,
+        minThroughput: 1.0, // Require at least 1 req/s
       };
 
       const result = collector.checkSLO(slo);
@@ -444,7 +497,7 @@ describe('Performance Tracking Tests', () => {
 
     it('should handle requests without token usage', () => {
       const request = collector.startRequest();
-      request.end();
+      request.end(); // No usage info
 
       const metrics = collector.getMetrics();
       expect(metrics[0].inputTokens).toBeUndefined();
@@ -468,6 +521,7 @@ describe('Performance Tracking Tests', () => {
 
   describe('Filtering and Queries', () => {
     it('should filter metrics by success status', () => {
+      // Add 3 successful and 2 failed
       for (let i = 0; i < 3; i++) {
         const req = collector.startRequest();
         req.end({ inputTokens: 50, outputTokens: 25, model: 'llama3.1:8b' });
@@ -511,6 +565,7 @@ describe('Performance Tracking Tests', () => {
       const allMetrics = collector.getMetrics();
       expect(allMetrics).toHaveLength(5);
 
+      // Should return a copy (not affect internal state)
       allMetrics.pop();
       expect(collector.getMetrics()).toHaveLength(5);
     });

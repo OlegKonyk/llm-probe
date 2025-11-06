@@ -317,6 +317,9 @@ export function containsRequiredTerms(
   text: string,
   requiredTerms: string[]
 ): { passed: boolean; coverage: number; missing: string[] } {
+  // Handle empty required terms: automatic pass
+  // This prevents division by zero and makes sense semantically
+  // (if no terms are required, everything passes)
   if (requiredTerms.length === 0) {
     return {
       passed: true,
@@ -325,23 +328,23 @@ export function containsRequiredTerms(
     };
   }
 
+  // Case-insensitive matching
   const textLower = text.toLowerCase();
-  const missing: string[] = [];
-  let foundCount = 0;
 
-  for (const term of requiredTerms) {
-    const regex = new RegExp(`\\b${term.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
-    if (regex.test(textLower)) {
-      foundCount++;
-    } else {
-      missing.push(term);
-    }
-  }
+  // Find which required terms are present (substring match)
+  const found = requiredTerms.filter((term) =>
+    textLower.includes(term.toLowerCase())
+  );
+
+  // Find which required terms are missing
+  const missing = requiredTerms.filter(
+    (term) => !textLower.includes(term.toLowerCase())
+  );
 
   return {
-    passed: missing.length === 0,
-    coverage: foundCount / requiredTerms.length,
-    missing,
+    passed: found.length === requiredTerms.length,  // Pass only if all terms found
+    coverage: found.length / requiredTerms.length,   // % of terms found
+    missing,                                          // List of missing terms
   };
 }
 

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Reference - Ally.ai Interview Cheat Sheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background: #f0f0f0;
+            padding: 15px;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border-radius: 6px;
+        }
+        
+        h1 {
+            color: #6B0082;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            text-align: center;
+            border-bottom: 3px solid #6B0082;
+            padding-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #6B0082;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #6B0082;
+        }
+        
+        h3 {
+            color: #8B00A3;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        
+        h4 {
+            color: #333;
+            font-size: 1em;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        ul, ol {
+            margin: 8px 0 8px 25px;
+        }
+        
+        li {
+            margin: 4px 0;
+        }
+        
+        .key-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.95em;
+        }
+        
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background: #6B0082;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        .checkmark {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .xmark {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .card h4 {
+            margin-top: 0;
+            color: #6B0082;
+        }
+        
+        .emoji {
+            font-size: 1.1em;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="emoji">📋</span> QUICK REFERENCE - INTERVIEW CHEAT SHEET</h1>
+        <div class="subtitle">Principal Software Test Engineer - Ally.ai Platform</div>
+
+        <div class="key-box">
+            <h3 style="margin-top: 0;"><span class="emoji">🎯</span> YOUR ELEVATOR PITCH (30 seconds)</h3>
+            <p><em>"10+ years SDET, built scalable API testing frameworks, led testing for monolith-to-microservices migration with zero production incidents. <strong>Unique advantage</strong>: Daily user of AI dev tools (Claude Code, Gemini) - I understand LLM non-determinism firsthand. Ready to define quality standards for Ally.ai's production GenAI platform serving 10,000+ users."</em></p>
+        </div>
+
+        <h2><span class="emoji">💪</span> YOUR TOP 5 STRENGTHS</h2>
+        <ol>
+            <li><strong>API Testing Expert</strong>: Playwright + TypeScript framework, comprehensive endpoint coverage</li>
+            <li><strong>AI Systems Experience</strong>: Daily use of Claude Code/Gemini - understand non-deterministic challenges</li>
+            <li><strong>Platform Scale</strong>: Led testing for Merit's microservices migration, smooth production rollout</li>
+            <li><strong>DevSecOps</strong>: GitHub Actions/CircleCI integration, DataDog monitoring, quality gates</li>
+            <li><strong>Mentorship</strong>: Led 8 QA engineers (Apple), created org-wide standards (Merit Postman collections)</li>
+        </ol>
+
+        <h2><span class="emoji">🔑</span> KEY NUMBERS TO DROP</h2>
+        
+        <div class="grid-2">
+            <div class="card">
+                <h4>Your Impact:</h4>
+                <ul style="margin-left: 15px;">
+                    <li>10+ years experience</li>
+                    <li>Led 8 QA engineers</li>
+                    <li>83% test time reduction (12h → 2h at Apple)</li>
+                    <li>Millions of users served (Merit platform)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Ally.ai Context:</h4>
+                <ul style="margin-left: 15px;">
+                    <li>10,000+ employees using platform</li>
+                    <li>82% accuracy (no human modification)</li>
+                    <li>$4M annualized business value</li>
+                    <li>Only 5% of AI initiatives succeed</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2><span class="emoji">🎤</span> MUST-TELL STORIES (STAR Format)</h2>
+
+        <h3>Story 1: Platform Migration Success</h3>
+        <ul>
+            <li><strong>S</strong>: Merit's monolith → microservices migration</li>
+            <li><strong>T</strong>: Ensure zero production regressions across 100+ endpoints</li>
+            <li><strong>A</strong>: Built Playwright framework + Pact contracts + Artillery.js performance + CI/CD integration</li>
+            <li><strong>R</strong>: Zero production incidents, smooth rollout, framework still in use</li>
+        </ul>
+
+        <h3>Story 2: Flaky Test Elimination</h3>
+        <ul>
+            <li><strong>S</strong>: Apple - tests taking 12 hours, high flakiness</li>
+            <li><strong>T</strong>: Reduce time and increase reliability</li>
+            <li><strong>A</strong>: Designed test machine management system, proper wait strategies, test isolation</li>
+            <li><strong>R</strong>: 12h → 2h (83% improvement), significant flakiness reduction</li>
+        </ul>
+
+        <h3>Story 3: AI Testing Insight</h3>
+        <ul>
+            <li><strong>S</strong>: Using Claude Code/Gemini daily in current role</li>
+            <li><strong>T</strong>: Understand how to test non-deterministic systems</li>
+            <li><strong>A</strong>: Learned exact-match assertions fail, need semantic validation + statistical thresholds + golden datasets</li>
+            <li><strong>R</strong>: Can bring this real-world AI experience to define Ally.ai test strategy</li>
+        </ul>
+
+        <h2><span class="emoji">🧠</span> TESTING LLM APIs - KEY TALKING POINTS</h2>
+
+        <div class="info-box">
+            <h4>The Challenge:</h4>
+            <ul style="margin-left: 15px;">
+                <li>Same prompt ≠ same output (non-deterministic)</li>
+                <li>Hallucinations (plausible but wrong)</li>
+                <li>Latency variability</li>
+                <li>Bias detection</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h4>Your Approach:</h4>
+            <p><strong><span class="xmark">❌</span> DON'T:</strong> <code>assert response == "exact text"</code></p>
+            <p><strong><span class="checkmark">✓</span> DO:</strong></p>
+            <ul style="margin-left: 15px;">
+                <li>Semantic similarity (threshold ≥ 0.85)</li>
+                <li>Structural validation (JSON schema)</li>
+                <li>Statistical variance checks</li>
+                <li>LLM-as-a-judge patterns</li>
+                <li>Golden dataset regression testing</li>
+                <li>Hallucination detection</li>
+            </ul>
+        </div>
+
+        <h4>Testing Layers:</h4>
+        <ol>
+            <li><strong>Contract tests</strong> (API schema validation)</li>
+            <li><strong>Functional</strong> (happy path + edge cases)</li>
+            <li><strong>Performance</strong> (latency, throughput, cost-per-call)</li>
+            <li><strong>Chaos/Resiliency</strong> (timeouts, retries, degradation)</li>
+            <li><strong>Security</strong> (prompt injection, PII leakage)</li>
+        </ol>
+
+        <div class="key-box">
+            <h4>Your Quote:</h4>
+            <p><em>"Testing LLM outputs requires shifting from exact-match to semantic validation. I'd use multi-layered approach: structural validation + semantic similarity scoring + behavioral constraints + LLM-as-judge for quality. Run critical tests multiple times to measure consistency with statistical thresholds."</em></p>
+        </div>
+
+        <h2><span class="emoji">👥</span> KNOW YOUR INTERVIEWERS</h2>
+
+        <div class="grid-3">
+            <div class="card">
+                <h4>Jason G.</h4>
+                <p><strong>Principal AI Engineer (Tampa)</strong></p>
+                <p><strong>Built:</strong> Ally.ai 0→10K users, $4M value</p>
+                <p><strong>Cares:</strong> Production quality, business value</p>
+                <p><strong>Ask:</strong> "What quality issue kept you up at night?"</p>
+                <p><strong>Connect:</strong> Platform migration, AI tools</p>
+            </div>
+            
+            <div class="card">
+                <h4>Ming Li</h4>
+                <p><strong>Principal SWE, Gen AI Platform (NYC)</strong></p>
+                <p><strong>Background:</strong> ML→GenAI, Math/Stats MS</p>
+                <p><strong>Cares:</strong> Platform architecture, scalability</p>
+                <p><strong>Ask:</strong> "What's 'good' test architecture?"</p>
+                <p><strong>Connect:</strong> Data integrity, distributed systems</p>
+            </div>
+            
+            <div class="card">
+                <h4>Adric Saxon</h4>
+                <p><strong>Fellow SWE, Dev Platforms (Ft. Laud.)</strong></p>
+                <p><strong>Focus:</strong> DX, API platforms, security</p>
+                <p><strong>Cares:</strong> Inner-source, DX, CI/CD</p>
+                <p><strong>Ask:</strong> "How to integrate with DX?"</p>
+                <p><strong>Connect:</strong> Postman collections, CI/CD</p>
+            </div>
+        </div>
+
+        <h2><span class="emoji">❓</span> BEST QUESTIONS TO ASK</h2>
+
+        <h4>Technical:</h4>
+        <ol>
+            <li>"How do you currently measure LLM output quality in production?"</li>
+            <li>"What quality issues kept you up at night during Ally.ai scaling?"</li>
+            <li>"How do you balance AI experimentation speed with quality rigor?"</li>
+        </ol>
+
+        <h4>Strategic:</h4>
+        <ol start="4">
+            <li>"What's test architecture vision for Gen AI platform?"</li>
+            <li>"How should testing integrate with Developer Experience?"</li>
+            <li>"What does success look like in first 6 months?"</li>
+        </ol>
+
+        <h4>Culture:</h4>
+        <ol start="7">
+            <li>"What inner-source contributions have been most valuable?"</li>
+            <li>"How does Ally approach responsible AI / ethics?"</li>
+            <li>"What excites you most about Ally.ai's future?"</li>
+        </ol>
+
+        <h2><span class="emoji">⚠️</span> RED FLAGS TO AVOID</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th><span class="xmark">❌</span> Don't Say</th>
+                    <th><span class="checkmark">✓</span> Instead Say</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>"I've never tested AI"</td>
+                    <td>"I use AI tools daily, understand challenges"</td>
+                </tr>
+                <tr>
+                    <td>"AI testing is impossible"</td>
+                    <td>"AI needs new patterns: semantic validation"</td>
+                </tr>
+                <tr>
+                    <td>"I work alone"</td>
+                    <td>"I thrive on cross-team collaboration"</td>
+                </tr>
+                <tr>
+                    <td>"I'm just a tester"</td>
+                    <td>"I own quality strategy and mentor teams"</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><span class="emoji">🎯</span> JOB REQUIREMENTS - YOUR PROOF</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>They Need</th>
+                    <th>You Have</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>5+ years Python</td>
+                    <td><span class="checkmark">✓</span> 10+ years total</td>
+                </tr>
+                <tr>
+                    <td>3+ years API testing</td>
+                    <td><span class="checkmark">✓</span> Current 3.5 yrs + Apple + RV</td>
+                </tr>
+                <tr>
+                    <td>GitLab CI/CD</td>
+                    <td><span class="checkmark">✓</span> GitHub Actions + CircleCI</td>
+                </tr>
+                <tr>
+                    <td>Regression testing</td>
+                    <td><span class="checkmark">✓</span> Platform migration experience</td>
+                </tr>
+                <tr>
+                    <td>Postman collections</td>
+                    <td><span class="checkmark">✓</span> Created at Merit (org-wide)</td>
+                </tr>
+                <tr>
+                    <td>AWS cloud</td>
+                    <td><span class="checkmark">✓</span> AWS + GCP experience</td>
+                </tr>
+                <tr>
+                    <td>AI/GenAI</td>
+                    <td><span class="checkmark">✓</span> Claude Code, Gemini daily</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2><span class="emoji">💡</span> YOUR SECRET WEAPON</h2>
+
+        <div class="warning-box">
+            <h4><span class="emoji">🚀</span> You're already using what they need tested.</h4>
+            <p>Most candidates <strong>theorize</strong> about LLM testing.<br>
+            You <strong>use</strong> Claude Code and Gemini <strong>every day</strong>.</p>
+            <p>You've felt the non-determinism.<br>
+            You understand the developer workflow.<br>
+            You know what engineers need.</p>
+            <p><strong>That's your ace. Play it.</strong></p>
+        </div>
+
+        <h2><span class="emoji">🎬</span> OPENING (2 MIN)</h2>
+
+        <div class="info-box">
+            <p>"I'm an SDET with 10+ years building scalable test frameworks for complex systems. Most recently at Merit, I'm key to a backend platform processing millions of digital credentials via REST APIs.</p>
+            
+            <p>Three things are particularly relevant:</p>
+            
+            <p><strong>First</strong> - Comprehensive API testing: Built Playwright + TypeScript framework with complete endpoint coverage across microservices. Led testing for monolith-to-microservices migration with smooth production rollout.</p>
+            
+            <p><strong>Second</strong> - Non-deterministic systems: I use Claude Code, Gemini, and Codex extensively. I understand that traditional exact-match assertions don't work - you need semantic validation, statistical approaches, and golden datasets.</p>
+            
+            <p><strong>Third</strong> - Platform thinking: Beyond tests, I've implemented contract testing with Pact, performance testing identifying bottlenecks, CI/CD integration, and DataDog monitoring. Created Postman collections that became org-wide standard.</p>
+            
+            <p>I'm excited because Ally.ai is one of the rare AI initiatives delivering real business value - that 82% accuracy and $4M value shows you're doing it right. I want to help define quality standards for next-gen AI systems in financial services."</p>
+        </div>
+
+        <h2><span class="emoji">🎬</span> CLOSING</h2>
+
+        <div class="info-box">
+            <p>"I really appreciate the time today. Three things stand out:</p>
+            
+            <p><strong>One</strong> - Scale and impact. You're in production serving 10,000+ employees with measurable business value. This is real systems that matter.</p>
+            
+            <p><strong>Two</strong> - Technical challenge. Testing LLM-powered APIs in regulated financial services is cutting edge. I love that this requires both deep technical expertise and strategic thinking.</p>
+            
+            <p><strong>Three</strong> - The team. [Reference something from conversation]. You're building something special.</p>
+            
+            <p>Based on our discussion, I'm confident I can immediately add value - both in building robust frameworks and mentoring teams. My experience with API testing, platform migrations, AI tooling, and production systems directly maps to what you need.</p>
+            
+            <p>What are the next steps?"</p>
+        </div>
+
+        <h2><span class="emoji">🏆</span> IF YOU COULD ONLY SAY ONE THING</h2>
+
+        <div class="success-box">
+            <p style="font-size: 1.1em; font-weight: 600; text-align: center;">
+                "I've spent 10 years building test frameworks for complex backend systems, I'm already using AI development tools daily so I understand non-deterministic challenges firsthand, and I've proven I can lead quality strategies enabling smooth production deployments. Ally.ai is solving real problems at scale - I want to ensure your quality matches your innovation."
+            </p>
+        </div>
+
+        <h2><span class="emoji">📋</span> PRE-INTERVIEW CHECKLIST</h2>
+
+        <div class="grid-2">
+            <div class="card">
+                <h4>Day Before:</h4>
+                <ul style="margin-left: 15px;">
+                    <li>☐ Review this cheat sheet</li>
+                    <li>☐ Practice opening out loud</li>
+                    <li>☐ Prepare 3 questions per interviewer</li>
+                    <li>☐ Get good sleep</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Day Of:</h4>
+                <ul style="margin-left: 15px;">
+                    <li>☐ Log in 10 min early</li>
+                    <li>☐ Have this open</li>
+                    <li>☐ Water nearby</li>
+                    <li>☐ Notebook ready</li>
+                    <li>☐ Be yourself!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="success-box" style="text-align: center; padding: 20px; margin-top: 25px;">
+            <h2 style="color: #28a745; margin: 0 0 10px 0;"><span class="emoji">🚀</span> YOU'VE GOT THIS!</h2>
+            <p style="font-size: 1.1em; margin: 10px 0;">Remember: They need you as much as you need them.</p>
+            <p style="font-size: 1.1em; margin: 10px 0;">Ally.ai's success depends on rock-solid testing.</p>
+            <p style="font-size: 1.2em; font-weight: bold; color: #6B0082; margin-top: 15px;">Show them what you can do.</p>
+        </div>
+    </div>
+</body>
+</html>

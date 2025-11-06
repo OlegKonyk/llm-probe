@@ -1,44 +1,75 @@
+/**
+ * Summarization API Routes
+ *
+ * Defines the REST API endpoints for call transcript summarization.
+ * Handles request validation, LLM invocation, performance tracking,
+ * and error responses.
+ *
+ * Key Features:
+ * - Request validation using Zod schemas
+ * - Latency tracking for performance monitoring
+ * - Token usage reporting
+ * - Comprehensive error handling
+ *
+ * Mounted at: /api/v1 (see index.ts)
+ */
+
 import { Router } from 'express';
-import { ZodError } from 'zod';
 import { SummarizationService } from '../services/summarization.js';
 import { summarizeRequestSchema } from '../types/schemas.js';
 import { logger } from '../utils/logger.js';
-import { countTokens } from '../utils/token-counter.js';
 import { OllamaConnectionError, ModelNotFoundError, LLMGenerationError, LLMTimeoutError } from '../errors/llm-errors.js';
 
 const router = Router();
 const summarizationService = new SummarizationService();
 
-// llama3.2:latest has ~8k context window
-// Reserve space for prompt structure (~300 tokens) and output (up to ~780 tokens for maxLength=500)
-const MAX_TRANSCRIPT_TOKENS = 7000;
-
 /**
  * POST /summarize
- * Generates a summary of a call transcript
+ *
+ * Generates a concise summary of a customer support call transcript
+ * using a local LLM (Ollama).
+ *
+ * Request Body:
+ * {
+ *   transcript: string,           // Call transcript (min 10 chars)
+ *   options?: {
+ *     maxLength?: number,          // Max words (50-500, default: 150)
+ *     includeKeyPoints?: boolean,  // Add key points list (default: true)
+ *     includeSentiment?: boolean   // Add sentiment analysis (default: false)
+ *   }
+ * }
+ *
+ * Response (200):
+ * {
+ *   summary: string,               // Generated summary
+ *   metadata: {
+ *     latency_ms: number,          // Time taken to generate
+ *     tokens_used: number,         // LLM tokens consumed
+ *     model: string,               // Model used (e.g., "llama3.2:latest")
+ *     timestamp: string            // ISO8601 timestamp
+ *   }
+ * }
+ *
+ * Error Response (500):
+ * {
+ *   error: string,                 // Error type
+ *   message: string                // Error details
+ * }
  */
 router.post('/summarize', async (req, res) => {
   try {
+    // Validate request body against schema (throws on invalid input)
     const { transcript, options } = summarizeRequestSchema.parse(req.body);
 
-    const transcriptTokens = countTokens(transcript);
-    if (transcriptTokens > MAX_TRANSCRIPT_TOKENS) {
-      logger.warn('Transcript exceeds token limit', {
-        transcriptTokens,
-        maxTokens: MAX_TRANSCRIPT_TOKENS,
-        transcriptLength: transcript.length,
-      });
-
-      return res.status(413).json({
-        error: 'Payload Too Large',
-        message: `Transcript exceeds maximum token limit of ${MAX_TRANSCRIPT_TOKENS}`,
-      });
-    }
-
     const startTime = Date.now();
+
+    // Call LLM service to generate summary
     const result = await summarizationService.summarize(transcript, options);
+
+    // Calculate request latency for monitoring
     const latency = Date.now() - startTime;
 
+    // Return summary with performance metadata
     res.json({
       summary: result.summary,
       metadata: {
@@ -49,6 +80,10 @@ router.post('/summarize', async (req, res) => {
       },
     });
   } catch (error) {
+    // Handle custom error types with appropriate HTTP status codes
+    // Detailed logging already done in service layer
+
+    // Timeout error: Generation took too long
     if (error instanceof LLMTimeoutError) {
       return res.status(504).json({
         error: 'Gateway Timeout',
@@ -56,6 +91,7 @@ router.post('/summarize', async (req, res) => {
       });
     }
 
+    // Connection error: Ollama service unavailable
     if (error instanceof OllamaConnectionError) {
       return res.status(503).json({
         error: 'Service Unavailable',
@@ -63,6 +99,7 @@ router.post('/summarize', async (req, res) => {
       });
     }
 
+    // Model not found: Required model not available
     if (error instanceof ModelNotFoundError) {
       return res.status(502).json({
         error: 'Bad Gateway',
@@ -70,6 +107,7 @@ router.post('/summarize', async (req, res) => {
       });
     }
 
+    // LLM generation error: Generic processing failure
     if (error instanceof LLMGenerationError) {
       return res.status(500).json({
         error: 'Internal Server Error',
@@ -77,10 +115,12 @@ router.post('/summarize', async (req, res) => {
       });
     }
 
-    if (error instanceof ZodError) {
+    // Validation error: Invalid request format
+    // Zod errors are thrown before reaching summarization service
+    if (error && typeof error === 'object' && 'issues' in error) {
       logger.warn('Invalid request format', {
         transcriptLength: req.body.transcript?.length,
-        validationErrors: error.issues,
+        validationErrors: error,
       });
 
       return res.status(400).json({
@@ -89,7 +129,9 @@ router.post('/summarize', async (req, res) => {
       });
     }
 
-    logger.error('Unexpected error in summarization endpoint', error, {
+    // Fallback: Unknown error type
+    logger.error('Unexpected error in summarization endpoint', {
+      error: String(error),
       transcriptLength: req.body.transcript?.length,
     });
 
