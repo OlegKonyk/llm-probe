@@ -34,7 +34,7 @@ app.use(limiter);
 app.use(express.json());
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.use('/api/v1', summarizationRouter);
