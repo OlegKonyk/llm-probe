@@ -113,12 +113,12 @@
 47. `add performance tests` - April 4, 10:00 AM
 48. `add monitoring tests` - April 4, 2:00 PM
 
-### PR #13: Core documentation
-**Branch:** `feat/core-docs`
+### PR #13: Python framework
+**Branch:** `feat/python-framework`
 **Commits:**
-49. `add comprehensive readme` - April 5, 9:00 AM
-50. `add architecture docs` - April 5, 1:00 PM
-51. `add testing guide and contributing guide` - April 5, 3:30 PM
+49. `add python test framework structure` - April 5, 9:00 AM
+50. `add python evaluators and metrics` - April 5, 1:00 PM
+51. `add python unit tests` - April 5, 3:30 PM
 
 ### PR #14: Docker & deployment
 **Branch:** `feat/docker-deployment`
@@ -127,12 +127,12 @@
 53. `add env examples and deployment configs` - April 6, 1:30 PM
 54. `add hugging face deployment` - April 6, 3:00 PM
 
-### PR #15: Python framework
-**Branch:** `feat/python-framework`
+### PR #15: Core documentation
+**Branch:** `feat/core-docs`
 **Commits:**
-55. `add python test framework structure` - April 7, 9:00 AM
-56. `add python evaluators and metrics` - April 7, 1:00 PM
-57. `add python unit tests` - April 7, 3:30 PM
+55. `add comprehensive readme` - April 7, 9:00 AM
+56. `add architecture docs` - April 7, 1:00 PM
+57. `add testing guide and contributing guide` - April 7, 3:30 PM
 
 ---
 
