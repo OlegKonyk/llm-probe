@@ -113,22 +113,32 @@
 47. `add performance tests` - April 4, 10:00 AM
 48. `add monitoring tests` - April 4, 2:00 PM
 
-### PR #13: Documentation & polish
-**Branch:** `feat/docs-polish`
+### PR #13: Core documentation
+**Branch:** `feat/core-docs`
 **Commits:**
 49. `add comprehensive readme` - April 5, 9:00 AM
 50. `add architecture docs` - April 5, 1:00 PM
-51. `add testing guide` - April 5, 3:30 PM
-52. `add contributing guide` - April 6, 10:00 AM
-53. `add test scripts and docker support` - April 6, 1:30 PM
-54. `add python test framework` - April 6, 3:00 PM
-55. `final polish and badges` - April 6, 5:00 PM
+51. `add testing guide and contributing guide` - April 5, 3:30 PM
+
+### PR #14: Docker & deployment
+**Branch:** `feat/docker-deployment`
+**Commits:**
+52. `add docker support` - April 6, 10:00 AM
+53. `add env examples and deployment configs` - April 6, 1:30 PM
+54. `add hugging face deployment` - April 6, 3:00 PM
+
+### PR #15: Python framework
+**Branch:** `feat/python-framework`
+**Commits:**
+55. `add python test framework structure` - April 7, 9:00 AM
+56. `add python evaluators and metrics` - April 7, 1:00 PM
+57. `add python unit tests` - April 7, 3:30 PM
 
 ---
 
 ## Summary
-- **Total commits:** 55
-- **Total PRs:** 13
+- **Total commits:** 57
+- **Total PRs:** 15
 - **Timeline:** 4 weeks
 - **Average:** ~2 commits/day (realistic for side project)
 - **PR frequency:** 2-3 per week
