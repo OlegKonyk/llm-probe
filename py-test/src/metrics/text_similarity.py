@@ -279,7 +279,7 @@ def contains_required_terms(
     Used to ensure critical information is not omitted by the LLM.
 
     How It Works:
-    - Case-insensitive substring matching
+    - Case-insensitive whole word matching (using regex word boundaries)
     - Returns pass/fail + coverage % + list of missing terms
     - Empty required terms list = automatic pass
 
@@ -319,14 +319,21 @@ def contains_required_terms(
             'missing': []
         }
 
-    # Case-insensitive matching
+    # Case-insensitive matching with word boundaries
     text_lower = text.lower()
 
-    # Find which required terms are present (substring match)
-    found = [term for term in required_terms if term.lower() in text_lower]
+    # Find which required terms are present (whole word match using regex)
+    # Use word boundaries (\b) to avoid false positives like "cat" in "caterpillar"
+    found = [
+        term for term in required_terms
+        if re.search(r'\b' + re.escape(term.lower()) + r'\b', text_lower)
+    ]
 
     # Find which required terms are missing
-    missing = [term for term in required_terms if term.lower() not in text_lower]
+    missing = [
+        term for term in required_terms
+        if not re.search(r'\b' + re.escape(term.lower()) + r'\b', text_lower)
+    ]
 
     return {
         'passed': len(found) == len(required_terms),
