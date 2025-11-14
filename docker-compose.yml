@@ -33,6 +33,7 @@ services:
       - OLLAMA_HOST=http://ollama:11434
       - LLM_PROVIDER=ollama
       - LLM_MODEL=llama3.2:latest
+      - LLM_TIMEOUT_MS=90000
       - API_KEY_AUTH_ENABLED=false
     depends_on:
       ollama:

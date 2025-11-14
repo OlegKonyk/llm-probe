@@ -14,7 +14,8 @@ export class OllamaProvider implements LLMProvider {
   }
 
   async generate(prompt: string, options?: LLMOptions): Promise<LLMResponse> {
-    const timeoutMs = options?.timeoutMs ?? 30000; // Default 30s timeout
+    const defaultTimeout = parseInt(process.env.LLM_TIMEOUT_MS || '30000', 10);
+    const timeoutMs = options?.timeoutMs ?? defaultTimeout;
 
     // Note: The ollama library (v0.6.2) only supports aborting all ongoing requests via client.abort(),
     // not individual requests. For non-streaming requests, there's no per-request abort control.
