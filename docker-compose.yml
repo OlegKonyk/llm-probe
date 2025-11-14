@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Ollama LLM Service
   ollama:
@@ -12,7 +10,7 @@ services:
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      test: ["CMD", "ollama", "list"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -32,7 +30,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_HOST=http://ollama:11434
       - LLM_PROVIDER=ollama
       - LLM_MODEL=llama3.2:latest
       - API_KEY_AUTH_ENABLED=false

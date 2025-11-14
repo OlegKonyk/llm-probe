@@ -15,7 +15,6 @@ RUN npm ci
 
 # Copy source code
 COPY backend ./backend
-COPY tsconfig.json ./
 
 # Build TypeScript
 RUN npm run build --workspace=backend
